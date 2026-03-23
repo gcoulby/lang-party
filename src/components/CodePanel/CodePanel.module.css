@@ -53,6 +53,13 @@
   overflow-wrap: normal;
   margin: 0;
   flex: 1;
+  /* Allow keyboard scrolling */
+  outline: none;
+}
+
+.pre:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 .pre::-webkit-scrollbar { height: 4px; }

@@ -21,7 +21,11 @@ export function CodePanel({ panel }: Props) {
         <span className={styles.dot} data-lang={panel.lang} aria-hidden="true" />
         <span className={styles.langName}>{LANG_LABELS[panel.lang] ?? panel.lang}</span>
       </div>
-      <pre className={styles.pre}>
+      <pre
+        className={styles.pre}
+        tabIndex={0}
+        aria-label={`${LANG_LABELS[panel.lang] ?? panel.lang} code example`}
+      >
         {tokens.map((tok, i) => (
           <span key={i} className={styles[`token-${tok.type}`]}>
             {tok.value}

@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react'
 import { Header } from './Header'
 import { Sidebar } from './Sidebar'
 import { SectionView } from '../SectionView/SectionView'
@@ -11,22 +12,46 @@ interface Props {
 
 export function Layout({ state }: Props) {
   const section = SECTIONS.find((s) => s.id === state.activeSectionId) ?? SECTIONS[0]
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const handleSectionChange = useCallback(
+    (id: string) => {
+      state.setActiveSectionId(id)
+      setMenuOpen(false)
+    },
+    [state],
+  )
 
   return (
     <div className={styles.shell}>
+      <a href="#main-content" className={styles.skipLink}>
+        Skip to main content
+      </a>
+
       <Header
         sourceFilter={state.sourceFilter}
         targetLang={state.targetLang}
         onSourceChange={state.setSourceFilter}
         onTargetChange={state.setTargetLang}
-        onSectionChange={state.setActiveSectionId}
+        onSectionChange={handleSectionChange}
+        menuOpen={menuOpen}
+        onMenuToggle={() => setMenuOpen((o) => !o)}
       />
+
       <div className={styles.body}>
+        {menuOpen && (
+          <div
+            className={styles.backdrop}
+            onClick={() => setMenuOpen(false)}
+            aria-hidden="true"
+          />
+        )}
         <Sidebar
           activeSectionId={state.activeSectionId}
-          onSectionChange={state.setActiveSectionId}
+          onSectionChange={handleSectionChange}
+          mobileOpen={menuOpen}
         />
-        <main className={styles.main}>
+        <main id="main-content" className={styles.main} tabIndex={-1}>
           <SectionView
             section={section}
             sourceFilter={state.sourceFilter}

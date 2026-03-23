@@ -9,6 +9,8 @@ interface Props {
   onSourceChange: (v: SourceFilter) => void
   onTargetChange: (v: TargetLang) => void
   onSectionChange: (id: string) => void
+  menuOpen: boolean
+  onMenuToggle: () => void
 }
 
 const SOURCE_PILLS: { value: SourceFilter; label: string }[] = [
@@ -22,10 +24,30 @@ const TARGET_PILLS: { value: TargetLang; label: string }[] = [
   { value: 'ts', label: 'TS' },
 ]
 
-export function Header({ sourceFilter, targetLang, onSourceChange, onTargetChange, onSectionChange }: Props) {
+export function Header({
+  sourceFilter,
+  targetLang,
+  onSourceChange,
+  onTargetChange,
+  onSectionChange,
+  menuOpen,
+  onMenuToggle,
+}: Props) {
   return (
     <header className={styles.header}>
-      <div className={styles.logo}>
+      <button
+        className={styles.menuBtn}
+        onClick={onMenuToggle}
+        aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
+        aria-expanded={menuOpen}
+        aria-controls="sidebar-nav"
+      >
+        <span className={styles.menuIcon} aria-hidden="true">
+          {menuOpen ? '✕' : '☰'}
+        </span>
+      </button>
+
+      <div className={styles.logo} aria-label="lang.party">
         lang<span>.</span>party
       </div>
 
