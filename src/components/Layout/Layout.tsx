@@ -19,6 +19,7 @@ export function Layout({ state }: Props) {
         targetLang={state.targetLang}
         onSourceChange={state.setSourceFilter}
         onTargetChange={state.setTargetLang}
+        onSectionChange={state.setActiveSectionId}
       />
       <div className={styles.body}>
         <Sidebar
