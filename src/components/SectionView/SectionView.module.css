@@ -31,3 +31,10 @@
   max-width: 600px;
   line-height: 1.6;
 }
+
+.ecoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}

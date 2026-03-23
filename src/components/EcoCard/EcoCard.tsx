@@ -1,14 +1,5 @@
+import type { EcoMapping } from '../../types/content'
 import styles from './EcoCard.module.css'
-
-export interface EcoMapping {
-  /** The tool/concept in the source language */
-  from: string
-  /** Source language label, e.g. "Java" */
-  fromLabel: string
-  /** JS/TS equivalents. Prefix with ★ to mark as recommended. */
-  to: string[]
-  note?: string
-}
 
 interface Props {
   mapping: EcoMapping

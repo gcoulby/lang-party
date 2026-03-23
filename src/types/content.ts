@@ -20,6 +20,17 @@ export interface ConceptEntry {
   }
 }
 
+/** A tool/concept mapping from source language to JS/TS equivalent. */
+export interface EcoMapping {
+  /** Tool or concept name in the source language (e.g. "Maven") */
+  from: string
+  /** Source language label (e.g. "Java") */
+  fromLabel: string
+  /** JS/TS equivalents. Prefix with ★ to mark as recommended. */
+  to: string[]
+  note?: string
+}
+
 export interface Section {
   id: string
   slug: string
@@ -27,4 +38,6 @@ export interface Section {
   title: string
   description: string
   concepts: ConceptEntry[]
+  /** Ecosystem mapping cards — for group: 'ecosystem' sections */
+  ecoMappings?: EcoMapping[]
 }
