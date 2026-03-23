@@ -187,3 +187,31 @@ Nine solid reference sections. Each has 3–5 concepts with real, runnable code.
 ### Next Milestone
 M4 — `content-differences`: Conceptual Gaps and Gotchas — the highest-value pages.
 
+
+---
+
+## M5 — content-ecosystem — 2026-03-23
+
+### Plan
+Build: ecosystem.ts (Tool Equivalents), frameworks.ts (UI Frameworks), move EcoMapping to shared schema, extend SectionView to render ecoMappings grid.
+Files changed: src/types/content.ts, src/content/ecosystem.ts, src/content/frameworks.ts, src/components/EcoCard/EcoCard.tsx, src/components/SectionView/SectionView.tsx, src/components/SectionView/SectionView.module.css.
+Acceptance: all ecoMappings render as EcoCard grid in section view, ★ picks are visually distinguished, tests pass, build green.
+
+### Implementation Notes
+- EcoMapping interface moved from EcoCard.tsx local scope to types/content.ts, added `ecoMappings?: EcoMapping[]` to Section.
+- ecosystem.ts: 20+ mappings across build, bundler, test, lint, runtime, web framework, ORM, logging, validation, DI categories.
+- frameworks.ts: 13 mappings across component frameworks, meta-frameworks, state management, cross-platform desktop, mobile.
+- SectionView extended: ecoMappings grid rendered before concept cards using existing CSS grid pattern.
+- EcoCard.test.tsx: one test updated (`.note` selector → uses className correctly, no breakage).
+
+### Test Results
+61 passed, 0 failed, 0 skipped.
+
+### Build Result
+✓ built in 499ms — 231 kB JS (73 kB gzip), 8.6 kB CSS. Increase from content additions.
+
+### Evaluation
+Both ecosystem sections are dense and opinionated — exactly the reference quality target. The ★ first-pick pattern carries through consistently. EcoCard renders cleanly in the auto-fill grid. No new tech debt. EcoMapping correctly lives in the shared schema.
+
+### Next Milestone
+M6 — `search`: keyboard-accessible search over section/concept titles, Web Worker, no external deps.
