@@ -17,7 +17,7 @@ Tracked milestones for lang.party. The agent updates this file after each milest
 | M5 | `content-ecosystem` | Populate Tool Equivalents and UI Frameworks sections. Add equivalents table component. | `complete` | `feat/content-ecosystem` | 20+ eco mappings in Tool Equivalents, 13 in UI Frameworks. EcoMapping moved to shared schema. |
 | M6 | `search` | Keyboard-accessible search across section and concept titles, running in a Web Worker. No external search library. | `complete` | `feat/search` | 80 tests pass. Worker bundles separately (76 kB). Debounced 120ms. |
 | M7 | `polish` | Responsive layout, keyboard navigation, focus management, reduced-motion support, ARIA labels. Lighthouse accessibility ≥ 90. | `complete` | `feat/polish` | Skip link, mobile drawer, hamburger, code panels keyboard-scrollable. |
-| M8 | `deploy` | Confirm CI green, GitHub Pages deployment working. Tag v1.0.0 on main. | `in-progress` | `feat/deploy` | Requires GitHub Pages configured on the repo before this milestone runs. |
+| M8 | `deploy` | Confirm CI green, GitHub Pages deployment working. Tag v1.0.0 on main. | `complete` | `feat/deploy` | v1.0.0 tagged on main. CI triggers on push to main. GitHub Pages needs manual activation in repo settings. |
 
 ---
 
@@ -32,6 +32,7 @@ Tracked milestones for lang.party. The agent updates this file after each milest
 | M5 | `content-ecosystem` | 2026-03-23 |
 | M6 | `search` | 2026-03-23 |
 | M7 | `polish` | 2026-03-23 |
+| M8 | `deploy` | 2026-03-23 |
 
 ---
 

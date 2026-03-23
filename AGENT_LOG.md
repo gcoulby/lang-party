@@ -275,3 +275,31 @@ Mobile layout is functional. Skip link works. Code panels are keyboard-scrollabl
 
 ### Next Milestone
 M8 — `deploy`: confirm CI green, GitHub Pages deployment, tag v1.0.0.
+
+---
+
+## M8 — deploy — 2026-03-23
+
+### Plan
+Fix CI workflow for pnpm v10, make base URL dynamic for GitHub Pages, merge develop → main, tag v1.0.0.
+Files: .github/workflows/deploy.yml, vite.config.ts, package.json (add @types/node).
+
+### Implementation Notes
+- deploy.yml: updated pnpm action to v4/version 10. Trigger changed from develop to main (deploy should ship from the release branch). Fixed `pnpm test --run` → `pnpm test` (test script already calls vitest run).
+- vite.config.ts: base URL now reads `process.env.BASE_URL` so CI can set the correct repo name. Falls back to `/lang-party/` for local dev.
+- @types/node added as devDep to resolve `process` TypeScript error in vite config (which runs in Node, not the browser).
+- Triple-slash `/// <reference types="node" />` added to vite.config.ts.
+- develop merged to main via --no-ff. Tagged v1.0.0.
+- GitHub Pages deployment will trigger automatically on next push to main once GitHub Pages is activated in repo settings (Settings → Pages → Source: gh-pages branch).
+
+### Test Results
+80 passed, 0 failed, 0 skipped.
+
+### Build Result
+✓ built in 517ms — 235 kB main JS (75 kB gzip), 76 kB worker, 11.4 kB CSS.
+
+### Evaluation
+All eight milestones complete. The app is a full-featured Java/C++ → JS/TS reference tool: 13 content sections, hand-written syntax highlighter, Web Worker search, responsive layout, keyboard accessibility, GitHub Pages CI. The only remaining step is a human activating GitHub Pages in the repo settings. No tech debt introduced in this milestone.
+
+### Next Milestone
+All milestones complete. v1.0.0 tagged on main.
