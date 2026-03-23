@@ -47,6 +47,23 @@ try {
 }`,
         },
         {
+          lang: 'python',
+          code: `import asyncio
+
+# Python uses coroutines instead of Promises
+async def fetch_data() -> str:
+    await asyncio.sleep(1)  # non-blocking pause
+    return "data"
+
+# asyncio.gather = Promise.all
+async def main() -> None:
+    a, b = await asyncio.gather(fetch_data(), fetch_data())
+    print(a, b)
+
+asyncio.run(main())
+`,
+        },
+        {
           lang: 'js',
           code: `// Promise
 const promise = new Promise((resolve, reject) => {
@@ -113,6 +130,23 @@ cppcoro::task<void> run() {
     auto user = co_await fetchUser(1);
     std::cout << user << "\n";
 }`,
+        },
+        {
+          lang: 'python',
+          code: `import asyncio
+import aiohttp  # third-party async HTTP client
+
+async def get_user(user_id: int) -> dict:
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"/api/users/{user_id}") as resp:
+            return await resp.json()
+
+async def main() -> None:
+    user = await get_user(1)
+    print(user["name"])
+
+asyncio.run(main())
+`,
         },
         {
           lang: 'js',
@@ -186,6 +220,31 @@ auto f = std::async(std::launch::async, []() {
 try {
     int val = f.get(); // exception re-thrown here
 } catch (const std::runtime_error& e) { ... }`,
+        },
+        {
+          lang: 'python',
+          code: `import asyncio
+
+async def risky() -> str:
+    await asyncio.sleep(0.1)
+    raise ConnectionError("network timeout")
+
+async def main() -> None:
+    # Single await with try/except
+    try:
+        result = await risky()
+    except ConnectionError as e:
+        print(f"caught: {e}")
+
+    # gather with return_exceptions=True — like Promise.allSettled
+    results = await asyncio.gather(
+        risky(), risky(),
+        return_exceptions=True,
+    )
+    for r in results:
+        if isinstance(r, Exception):
+            print(f"error: {r}")
+`,
         },
         {
           lang: 'js',
