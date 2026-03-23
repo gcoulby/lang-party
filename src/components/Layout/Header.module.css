@@ -12,6 +12,36 @@
   height: var(--header-height);
 }
 
+.menuBtn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.menuBtn:hover {
+  color: var(--text);
+}
+
+.menuIcon {
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .menuBtn {
+    display: flex;
+    align-items: center;
+  }
+
+  .controls {
+    display: none;
+  }
+}
+
 .logo {
   font-family: var(--font-logo);
   font-size: 1.1rem;

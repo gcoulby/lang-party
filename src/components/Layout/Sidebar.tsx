@@ -34,11 +34,17 @@ const GROUPS = ['basics', 'differences', 'ecosystem'] as const
 interface Props {
   activeSectionId: AppState['activeSectionId']
   onSectionChange: (id: string) => void
+  mobileOpen: boolean
 }
 
-export function Sidebar({ activeSectionId, onSectionChange }: Props) {
+export function Sidebar({ activeSectionId, onSectionChange, mobileOpen }: Props) {
   return (
-    <nav className={styles.sidebar} aria-label="Section navigation">
+    <nav
+      id="sidebar-nav"
+      className={styles.sidebar}
+      aria-label="Section navigation"
+      data-mobile-open={mobileOpen ? 'true' : 'false'}
+    >
       {GROUPS.map((group) => {
         const sections = NAV_SECTIONS.filter((s) => s.group === group)
         return (
