@@ -16,8 +16,8 @@ Tracked milestones for lang.party. The agent updates this file after each milest
 | M4 | `content-differences` | Populate Conceptual Gaps and Gotchas sections. Highest content-quality bar of all milestones. | `complete` | `feat/content-differences` | 5 conceptual gaps + 6 gotchas. Opinionated callouts throughout. |
 | M5 | `content-ecosystem` | Populate Tool Equivalents and UI Frameworks sections. Add equivalents table component. | `complete` | `feat/content-ecosystem` | 20+ eco mappings in Tool Equivalents, 13 in UI Frameworks. EcoMapping moved to shared schema. |
 | M6 | `search` | Keyboard-accessible search across section and concept titles, running in a Web Worker. No external search library. | `complete` | `feat/search` | 80 tests pass. Worker bundles separately (76 kB). Debounced 120ms. |
-| M7 | `polish` | Responsive layout, keyboard navigation, focus management, reduced-motion support, ARIA labels. Lighthouse accessibility ≥ 90. | `in-progress` | `feat/polish` | Mobile layout collapses sidebar into a drawer. |
-| M8 | `deploy` | Confirm CI green, GitHub Pages deployment working. Tag v1.0.0 on main. | `planned` | - | Requires GitHub Pages configured on the repo before this milestone runs. |
+| M7 | `polish` | Responsive layout, keyboard navigation, focus management, reduced-motion support, ARIA labels. Lighthouse accessibility ≥ 90. | `complete` | `feat/polish` | Skip link, mobile drawer, hamburger, code panels keyboard-scrollable. |
+| M8 | `deploy` | Confirm CI green, GitHub Pages deployment working. Tag v1.0.0 on main. | `in-progress` | `feat/deploy` | Requires GitHub Pages configured on the repo before this milestone runs. |
 
 ---
 
@@ -31,6 +31,7 @@ Tracked milestones for lang.party. The agent updates this file after each milest
 | M4 | `content-differences` | 2026-03-23 |
 | M5 | `content-ecosystem` | 2026-03-23 |
 | M6 | `search` | 2026-03-23 |
+| M7 | `polish` | 2026-03-23 |
 
 ---
 

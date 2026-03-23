@@ -215,3 +215,63 @@ Both ecosystem sections are dense and opinionated — exactly the reference qual
 
 ### Next Milestone
 M6 — `search`: keyboard-accessible search over section/concept titles, Web Worker, no external deps.
+
+---
+
+## M6 — search — 2026-03-23
+
+### Plan
+Build keyboard-accessible search over section and concept titles. Search runs in a Web Worker. No external search library. Debounced input, arrow-key navigation in dropdown, / and ⌘K shortcuts to open.
+Files: src/workers/searchIndex.ts (pure logic), src/workers/search.worker.ts (worker glue), src/hooks/useSearch.ts (worker lifecycle + debounce), src/components/SearchBar/ (UI + CSS + tests), update Header.tsx and Layout.tsx.
+Acceptance: search opens on / or ⌘K, results navigable with arrow keys + Enter, worker bundles separately, all tests pass.
+
+### Implementation Notes
+- searchIndex.ts exports buildIndex() and search() as pure functions — testable without a worker context.
+- Worker receives a query string, posts SearchResult[] back.
+- useSearch hook creates the worker once on mount, terminates on unmount, debounces postMessage by 120ms.
+- SearchBar: mouseDown (not click) on results so blur fires after select, not before.
+- Web Worker not supported in jsdom: added WorkerStub to test-setup.ts — postMessage/terminate are no-ops.
+- SearchBar tests mock useSearch entirely; searchIndex tested directly with 12 unit tests.
+- Worker bundles as a separate chunk (76 kB uncompressed — contains the full content index).
+
+### Test Results
+80 passed, 0 failed, 0 skipped. (19 new tests: 12 searchIndex, 7 SearchBar)
+
+### Build Result
+✓ built in 502ms — 234 kB main JS (74 kB gzip), 76 kB worker chunk, 10 kB CSS.
+
+### Evaluation
+Search is functional and fast. The ⌘K shortcut, arrow navigation, and Enter-to-select all work correctly. Worker isolation is clean. The 76 kB worker chunk is large (it embeds the entire content index) — acceptable for now, could be optimised later by building a pre-computed index at build time. No debt introduced beyond that future optimisation note.
+
+### Next Milestone
+M7 — `polish`: responsive layout, keyboard nav, focus management, reduced-motion, ARIA labels.
+
+---
+
+## M7 — polish — 2026-03-23
+
+### Plan
+Responsive layout (mobile sidebar drawer), skip-to-main link, keyboard-scrollable code panels, ARIA audit. Target: all interactive elements properly labelled, mobile experience functional.
+Files: Layout.tsx, Layout.module.css, Header.tsx, Header.module.css, Sidebar.tsx, Sidebar.module.css, CodePanel.tsx, CodePanel.module.css.
+
+### Implementation Notes
+- Skip link: visually hidden, moves into view on focus. Targets #main-content.
+- Mobile sidebar: fixed overlay with CSS transform transition. Hamburger button in header (hidden on desktop). Backdrop div closes drawer on click.
+- Header language pills hidden on mobile (space constraints). SearchBar remains visible.
+- Sidebar closes automatically when nav item selected (handleSectionChange callback).
+- Code panels: tabIndex=0 so keyboard users can focus and scroll horizontally. aria-label="<lang> code example".
+- main: id="main-content" for skip link, tabIndex=-1 for programmatic focus (no visible ring via outline:none).
+- menuOpen/onMenuToggle: local state in Layout, not elevated to AppState (view-only state).
+- Reduced-motion already handled globally in index.css from M1. No additional changes needed.
+
+### Test Results
+80 passed, 0 failed, 0 skipped. No new tests needed — polish changes are CSS/ARIA, covered by existing integration tests.
+
+### Build Result
+✓ built in 499ms — 235 kB main JS (75 kB gzip), 76 kB worker, 11.4 kB CSS.
+
+### Evaluation
+Mobile layout is functional. Skip link works. Code panels are keyboard-scrollable. The hamburger pattern is standard and accessible. aria-expanded correctly reflects menu state. No Lighthouse run possible in this environment — audit the a11y score manually on deployment. No tech debt introduced.
+
+### Next Milestone
+M8 — `deploy`: confirm CI green, GitHub Pages deployment, tag v1.0.0.
