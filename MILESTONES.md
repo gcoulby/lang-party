@@ -10,8 +10,8 @@ Tracked milestones for lang.party. The agent updates this file after each milest
 
 | # | Slug | Description | Status | Branch | Notes |
 |---|------|-------------|--------|--------|-------|
-| M1 | `scaffold` | Vite + React + TS project scaffold with routing shell, sidebar nav, header toggles, CSS token system, and empty section placeholder. Build and tests pass. | `planned` | - | Seed with existing prototype HTML as visual reference only — do not port HTML directly. |
-| M2 | `content-schema` | Define content types, implement ConceptCard / Callout / EcoCard components with tests, and build hand-written syntax highlighter for Java, C++, JS, TS. | `planned` | - | Highlighter must be hand-written — no external tokeniser libraries. |
+| M1 | `scaffold` | Vite + React + TS project scaffold with routing shell, sidebar nav, header toggles, CSS token system, and empty section placeholder. Build and tests pass. | `complete` | `feat/scaffold` | 9 tests pass, build 147 kB JS / 4 kB CSS. tsconfig.app.json splits app/test type-checking. |
+| M2 | `content-schema` | Define content types, implement ConceptCard / Callout / EcoCard components with tests, and build hand-written syntax highlighter for Java, C++, JS, TS. | `in-progress` | `feat/content-schema` | Highlighter must be hand-written — no external tokeniser libraries. |
 | M3 | `content-basics` | Populate all nine Language Basics sections with accurate, complete code examples (Variables, Functions, Classes, Interfaces, Generics, Errors, Async, Collections, Modules). | `planned` | - | All code examples must be syntactically correct. No pseudocode. |
 | M4 | `content-differences` | Populate Conceptual Gaps and Gotchas sections. Highest content-quality bar of all milestones. | `planned` | - | Blunt, opinionated tone. These are the pages engineers bookmark. |
 | M5 | `content-ecosystem` | Populate Tool Equivalents and UI Frameworks sections. Add equivalents table component. | `planned` | - | ★ markers indicate recommended-first picks. |
@@ -23,7 +23,9 @@ Tracked milestones for lang.party. The agent updates this file after each milest
 
 ## Completed Milestones
 
-_None yet._
+| # | Slug | Completed |
+|---|------|-----------|
+| M1 | `scaffold` | 2026-03-23 |
 
 ---
 
