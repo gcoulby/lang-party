@@ -1,5 +1,6 @@
 import type { AppState, SourceFilter } from '../../hooks/useAppState'
 import type { TargetLang } from '../../types/content'
+import { SearchBar } from '../SearchBar/SearchBar'
 import styles from './Header.module.css'
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
   targetLang: AppState['targetLang']
   onSourceChange: (v: SourceFilter) => void
   onTargetChange: (v: TargetLang) => void
+  onSectionChange: (id: string) => void
 }
 
 const SOURCE_PILLS: { value: SourceFilter; label: string }[] = [
@@ -20,12 +22,14 @@ const TARGET_PILLS: { value: TargetLang; label: string }[] = [
   { value: 'ts', label: 'TS' },
 ]
 
-export function Header({ sourceFilter, targetLang, onSourceChange, onTargetChange }: Props) {
+export function Header({ sourceFilter, targetLang, onSourceChange, onTargetChange, onSectionChange }: Props) {
   return (
     <header className={styles.header}>
       <div className={styles.logo}>
         lang<span>.</span>party
       </div>
+
+      <SearchBar onSelect={onSectionChange} />
 
       <div className={styles.controls}>
         <span className={styles.label}>from</span>
