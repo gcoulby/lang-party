@@ -1,0 +1,108 @@
+.wrapper {
+  position: relative;
+  flex: 1;
+  max-width: 300px;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  position: absolute;
+  left: 0.6rem;
+  font-size: 1rem;
+  color: var(--muted);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.3rem 2rem 0.3rem 1.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+  /* Remove native search clear button */
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.input::placeholder {
+  color: var(--muted);
+}
+
+.input:focus {
+  border-color: var(--accent);
+}
+
+.clear {
+  position: absolute;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+.clear:hover {
+  color: var(--text);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  list-style: none;
+  padding: 0.25rem 0;
+  margin: 0;
+  z-index: 200;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.item[data-active='true'],
+.item:hover {
+  background: var(--surface2);
+}
+
+.itemConcept {
+  font-size: 0.8rem;
+  color: var(--text);
+}
+
+.itemSection {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

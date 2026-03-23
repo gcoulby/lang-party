@@ -1,0 +1,40 @@
+.callout {
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  border-left: 3px solid;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  font-family: var(--font-mono);
+}
+
+.callout[data-variant='warn'] {
+  background: rgba(226, 255, 92, 0.05);
+  border-color: var(--accent);
+  color: #b8cc4e;
+}
+
+.callout[data-variant='info'] {
+  background: rgba(92, 255, 228, 0.05);
+  border-color: var(--accent2);
+  color: #4fccbb;
+}
+
+.callout[data-variant='alert'] {
+  background: rgba(255, 107, 107, 0.05);
+  border-color: var(--accent3);
+  color: #cc5555;
+}
+
+.callout strong {
+  color: #fff;
+  font-weight: 500;
+}
+
+.callout code {
+  font-family: var(--font-mono);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
