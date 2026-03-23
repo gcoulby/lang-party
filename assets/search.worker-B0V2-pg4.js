@@ -12,7 +12,21 @@ double price = 9.99;
 
 // C++11: auto (type inference)
 auto items = std::vector<std::string>{};
-auto total = 42;`},{lang:"js",code:`// JS: prefer const for all non-reassigned values
+auto total = 42;`},{lang:"python",code:`x: int = 42
+name: str = "Alice"
+active: bool = True
+
+# Type annotation is optional — Python infers
+count = 0
+`},{lang:"go",code:`// Short declaration (type inferred)
+x := 42
+name := "Alice"
+active := true
+
+// Explicit declaration
+var age int = 30
+var score float64
+`},{lang:"js",code:`// JS: prefer const for all non-reassigned values
 const count = 0;
 const name = 'Alice';
 const price = 9.99;
@@ -34,7 +48,26 @@ static final double PI = 3.14159265358979;`},{lang:"cpp",code:`const int MAX_SIZ
 const std::string VERSION = "1.0.0";
 
 // Prefer constexpr for compile-time constants
-constexpr double PI = 3.14159265358979;`},{lang:"js",code:`const MAX_SIZE = 100;
+constexpr double PI = 3.14159265358979;`},{lang:"python",code:`# No built-in const — use UPPER_SNAKE_CASE convention
+MAX_SIZE = 100
+PI = 3.14159
+
+# typing.Final signals no re-assignment to type checkers
+from typing import Final
+MAX_RETRIES: Final = 3
+`},{lang:"go",code:`const MaxSize = 100
+const Pi = 3.14159
+
+// Typed constant
+const Greeting string = "hello"
+
+// iota for enumerations
+const (
+    Small = iota  // 0
+    Medium        // 1
+    Large         // 2
+)
+`},{lang:"js",code:`const MAX_SIZE = 100;
 const VERSION = '1.0.0';
 const PI = 3.14159265358979;
 
@@ -64,7 +97,24 @@ double d    = 3.14;
 // C++11: fixed-width integers
 #include <cstdint>
 uint8_t  byte = 255;
-int32_t  i32  = 42;`},{lang:"js",code:`// JS has one numeric type: Number (IEEE 754 double)
+int32_t  i32  = 42;`},{lang:"python",code:`age: int = 30
+price: float = 9.99
+name: str = "Alice"
+active: bool = True
+none_val: None = None
+
+# Python ints are arbitrary-precision — no overflow
+big: int = 10 ** 100
+`},{lang:"go",code:`var age int = 30
+var price float64 = 9.99
+var name string = "Alice"
+var active bool = true
+var nothing interface{} = nil
+
+// Explicit int sizes when needed
+var b byte = 255  // uint8
+var r rune = 'A'  // int32 (Unicode code point)
+`},{lang:"js",code:`// JS has one numeric type: Number (IEEE 754 double)
 const i   = 42;
 const d   = 3.14;
 const big = 9007199254740991; // Number.MAX_SAFE_INTEGER
@@ -95,7 +145,26 @@ std::string* s = nullptr;
 // Prefer std::optional (C++17)
 #include <optional>
 std::optional<std::string> opt = std::nullopt;
-std::string val = opt.value_or("default");`},{lang:"js",code:`// JS has BOTH null (intentional absence) and
+std::string val = opt.value_or("default");`},{lang:"python",code:`# Python has only None — no undefined equivalent
+value: str | None = None
+
+# Idiomatic None check
+if value is None:
+    print("no value")
+
+# Falsy check (like JS !value)
+if not value:
+    print("falsy")
+`},{lang:"go",code:`// Go has nil for pointers, interfaces, maps, slices, channels
+var p *int = nil    // nil pointer
+var s []int = nil   // nil slice (valid, len=0)
+var m map[string]int = nil  // nil map
+
+// Zero values — Go initialises everything
+var x int    // 0
+var s2 string // ""
+var b bool   // false
+`},{lang:"js",code:`// JS has BOTH null (intentional absence) and
 // undefined (variable declared but not assigned)
 let a;          // undefined
 let b = null;   // null
@@ -128,7 +197,22 @@ auto name  = std::string{"Alice"};
 auto items = std::vector{1, 2, 3}; // C++17 deduction
 
 // decltype: get the type of an expression
-decltype(count) other = 5;  // int`},{lang:"js",code:`// JS is dynamically typed — no inference, no types
+decltype(count) other = 5;  // int`},{lang:"python",code:`# Python always infers — annotations are optional metadata
+count = 0           # int
+message = "hello"   # str
+items = [1, 2, 3]   # list[int]
+
+# mypy / pyright use hints for static analysis
+def greet(name: str) -> str:
+    return f"Hello, {name}"
+`},{lang:"go",code:`// := infers type from the right-hand side
+count := 0            // int
+message := "hello"    // string
+items := []int{1, 2, 3}  // []int
+
+// var with initialiser also infers
+var ratio = 3.14      // float64
+`},{lang:"js",code:`// JS is dynamically typed — no inference, no types
 // Values have types; variables don't
 const count = 0;        // runtime: number
 const name  = 'Alice';  // runtime: string`},{lang:"ts",code:`// TS infers types from initialiser — annotation optional
@@ -153,7 +237,16 @@ public void greet(String name) {
 void greet(const std::string& name) {
     std::cout << "Hello, " << name << "
 ";
-}`},{lang:"js",code:`function add(a, b) {
+}`},{lang:"python",code:`def add(a: int, b: int) -> int:
+    return a + b
+
+result = add(3, 4)  # 7
+`},{lang:"go",code:`func add(a, b int) int {
+    return a + b
+}
+
+result := add(3, 4)  // 7
+`},{lang:"js",code:`function add(a, b) {
     return a + b;
 }
 
@@ -185,7 +278,28 @@ auto byLength = [](const std::string& a,
 int threshold = 5;
 auto isLong = [threshold](const std::string& s) {
     return s.length() > threshold;
-};`},{lang:"js",code:`// Arrow function — concise syntax
+};`},{lang:"python",code:`# lambda: single expression only
+double = lambda x: x * 2
+print(double(5))  # 10
+
+# For multi-line, use def
+def triple(x: int) -> int:
+    return x * 3
+
+# map with lambda
+nums = [1, 2, 3]
+doubled = list(map(lambda x: x * 2, nums))
+`},{lang:"go",code:`// Go has no lambdas, but functions are first-class values
+double := func(x int) int {
+    return x * 2
+}
+fmt.Println(double(5))  // 10
+
+// Passed as argument
+nums := []int{1, 2, 3}
+apply := func(n int, f func(int) int) int { return f(n) }
+fmt.Println(apply(4, double))  // 8
+`},{lang:"js",code:`// Arrow function — concise syntax
 const add = (a, b) => a + b;
 
 // Arrow function with body
@@ -217,7 +331,28 @@ std::string greet(const std::string& name,
     return prefix + ", " + name + "!";
 }
 
-// Call: greet("Alice") or greet("Alice", "Hi")`},{lang:"js",code:`function greet(name, prefix = 'Hello') {
+// Call: greet("Alice") or greet("Alice", "Hi")`},{lang:"python",code:`def greet(name: str, greeting: str = "Hello") -> str:
+    return f"{greeting}, {name}!"
+
+greet("Alice")          # "Hello, Alice!"
+greet("Alice", "Hi")    # "Hi, Alice!"
+
+# NOTE: never use mutable defaults
+# def bad(items=[]):  # BUG — shared across calls
+# def good(items=None):
+#     if items is None: items = []
+`},{lang:"go",code:`// Go has no default params — use variadic or options pattern
+func greet(name string, args ...string) string {
+    greeting := "Hello"
+    if len(args) > 0 {
+        greeting = args[0]
+    }
+    return greeting + ", " + name + "!"
+}
+
+greet("Alice")        // "Hello, Alice!"
+greet("Alice", "Hi")  // "Hi, Alice!"
+`},{lang:"js",code:`function greet(name, prefix = 'Hello') {
     return prefix + ', ' + name + '!';
 }
 
@@ -247,7 +382,37 @@ int sum(std::initializer_list<int> nums) {
     int total = 0;
     for (int n : nums) total += n;
     return total;
-}`},{lang:"js",code:`// Rest parameter collects remaining args into array
+}`},{lang:"python",code:`# *args collects positional arguments
+def sum_all(*args: int) -> int:
+    return sum(args)
+
+sum_all(1, 2, 3)  # 6
+
+# **kwargs collects keyword arguments
+def config(**kwargs: str) -> None:
+    for k, v in kwargs.items():
+        print(f"{k}={v}")
+
+# Spread: * unpacks into function call
+nums = [1, 2, 3]
+print(*nums)  # 1 2 3
+
+merged = {**{"a": 1}, **{"b": 2}}  # {a:1, b:2}
+`},{lang:"go",code:`// Variadic parameters with ...
+func sumAll(nums ...int) int {
+    total := 0
+    for _, n := range nums {
+        total += n
+    }
+    return total
+}
+
+sumAll(1, 2, 3)      // 6
+
+// Spread a slice into variadic call
+nums := []int{1, 2, 3}
+sumAll(nums...)      // 6
+`},{lang:"js",code:`// Rest parameter collects remaining args into array
 function sum(...numbers) {
     return numbers.reduce((a, b) => a + b, 0);
 }
@@ -278,7 +443,36 @@ int    process(int x)         { return x * 2; }
 double process(double x)      { return x * 2.0; }
 std::string process(const std::string& s) {
     return s + s;
-}`},{lang:"js",code:`// JS has no overloading — one function, handle types manually
+}`},{lang:"python",code:`from typing import overload, Union
+
+# @overload gives type-checker hints; one impl handles all cases
+@overload
+def process(x: int) -> int: ...
+@overload
+def process(x: str) -> str: ...
+
+def process(x: Union[int, str]) -> Union[int, str]:
+    if isinstance(x, int):
+        return x * 2
+    return x.upper()
+
+process(5)      # 10
+process("hi")   # "HI"
+`},{lang:"go",code:`// Go has no overloading — use different names or interfaces
+func doubleInt(x int) int    { return x * 2 }
+func doubleStr(x string) string { return x + x }
+
+// Or use an interface
+func double(x interface{}) interface{} {
+    switch v := x.(type) {
+    case int:
+        return v * 2
+    case string:
+        return v + v
+    }
+    return x
+}
+`},{lang:"js",code:`// JS has no overloading — one function, handle types manually
 function process(x) {
     if (typeof x === 'number') return x * 2;
     if (typeof x === 'string') return x.repeat(2);
@@ -323,7 +517,31 @@ public:
 private:
     std::string name_;
     int age_;
-};`},{lang:"js",code:`class Person {
+};`},{lang:"python",code:`class Animal:
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+    def speak(self) -> str:
+        return f"{self.name} makes a sound"
+
+dog = Animal("Rex")
+print(dog.speak())  # "Rex makes a sound"
+`},{lang:"go",code:`type Animal struct {
+    Name string
+}
+
+func (a Animal) Speak() string {
+    return a.Name + " makes a sound"
+}
+
+// Constructor function (convention)
+func NewAnimal(name string) Animal {
+    return Animal{Name: name}
+}
+
+dog := NewAnimal("Rex")
+fmt.Println(dog.Speak())  // "Rex makes a sound"
+`},{lang:"js",code:`class Person {
     #name;
     #age;
 
@@ -380,7 +598,36 @@ public:
 };
 
 std::unique_ptr<Animal> a = std::make_unique<Dog>("Rex");
-a->speak(); // "Woof!" — requires virtual`},{lang:"js",code:`class Animal {
+a->speak(); // "Woof!" — requires virtual`},{lang:"python",code:`class Animal:
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+    def speak(self) -> str:
+        return "..."
+
+class Dog(Animal):
+    def speak(self) -> str:  # override
+        return f"{self.name} barks"
+
+dog = Dog("Rex")
+print(dog.speak())  # "Rex barks"
+print(isinstance(dog, Animal))  # True
+`},{lang:"go",code:`// Go has no inheritance — use embedding for composition
+type Animal struct{ Name string }
+func (a Animal) Speak() string { return a.Name + " makes a sound" }
+
+type Dog struct {
+    Animal  // embed — promotes methods
+    Breed string
+}
+
+func (d Dog) Speak() string {  // override
+    return d.Name + " barks"
+}
+
+dog := Dog{Animal: Animal{Name: "Rex"}, Breed: "Labrador"}
+fmt.Println(dog.Speak())  // "Rex barks"
+`},{lang:"js",code:`class Animal {
     constructor(name) { this.name = name; }
     speak() { return '...'; }
 }
@@ -422,7 +669,33 @@ private:
 
 public:
     int getSecret() const { return secret; }
-};`},{lang:"js",code:`class Vault {
+};`},{lang:"python",code:`class BankAccount:
+    def __init__(self, balance: float) -> None:
+        self.owner = "Alice"      # public (convention)
+        self._balance = balance   # "protected" (convention)
+        self.__secret = "key"     # name-mangled (_BankAccount__secret)
+
+    def get_balance(self) -> float:
+        return self._balance
+
+# Python has no true private — it is convention, not enforced
+account = BankAccount(100.0)
+print(account.owner)     # "Alice" — accessible
+print(account._balance)  # works (convention says don't)
+`},{lang:"go",code:`// Go uses capitalisation: Exported = public, lowercase = package-private
+type bankAccount struct {
+    owner   string   // package-private
+    balance float64  // package-private
+}
+
+func (b bankAccount) Balance() float64 {  // Exported method
+    return b.balance
+}
+
+func NewBankAccount(owner string, balance float64) bankAccount {
+    return bankAccount{owner: owner, balance: balance}
+}
+`},{lang:"js",code:`class Vault {
     visible = 1;       // public (default)
     #secret = 4;       // private (hard private — enforced at runtime)
 
@@ -457,7 +730,33 @@ private:
     static int count_;  // declaration
 };
 
-int Counter::count_ = 0; // definition (in .cpp)`},{lang:"js",code:`class Counter {
+int Counter::count_ = 0; // definition (in .cpp)`},{lang:"python",code:`class MathUtils:
+    PI = 3.14159  # class variable (shared across instances)
+
+    @staticmethod
+    def square(n: float) -> float:
+        return n * n
+
+    @classmethod
+    def circle_area(cls, r: float) -> float:
+        return cls.PI * r * r
+
+MathUtils.square(4)         # 16.0
+MathUtils.circle_area(5)    # 78.54...
+`},{lang:"go",code:`// Go has package-level variables and functions — no static members
+const Pi = 3.14159
+
+func Square(n float64) float64 {
+    return n * n
+}
+
+func CircleArea(r float64) float64 {
+    return Pi * r * r
+}
+
+Square(4)       // 16.0
+CircleArea(5)   // 78.54...
+`},{lang:"js",code:`class Counter {
     static #count = 0;
 
     constructor() { Counter.#count++; }
@@ -502,7 +801,41 @@ public:
         std::cout << "Printing report...
 ";
     }
-};`},{lang:"js",code:`// JS: no interface keyword — duck typing only
+};`},{lang:"python",code:`from typing import Protocol
+
+# Protocol = structural typing (no explicit "implements")
+class Drawable(Protocol):
+    def draw(self) -> None: ...
+    def area(self) -> float: ...
+
+class Circle:
+    def __init__(self, radius: float) -> None:
+        self.radius = radius
+    def draw(self) -> None:
+        print(f"circle r={self.radius}")
+    def area(self) -> float:
+        import math
+        return math.pi * self.radius ** 2
+
+def render(shape: Drawable) -> None:
+    shape.draw()
+
+render(Circle(5))  # works — Circle satisfies Drawable
+`},{lang:"go",code:`// Go interfaces are implicit — no "implements" keyword
+type Drawable interface {
+    Draw()
+    Area() float64
+}
+
+type Circle struct{ Radius float64 }
+
+func (c Circle) Draw()         { fmt.Printf("circle r=%.1f\\n", c.Radius) }
+func (c Circle) Area() float64 { return math.Pi * c.Radius * c.Radius }
+
+func render(d Drawable) { d.Draw() }
+
+render(Circle{Radius: 5})  // Circle satisfies Drawable automatically
+`},{lang:"js",code:`// JS: no interface keyword — duck typing only
 // A value "implements" a contract if it has the right shape
 
 class Report {
@@ -574,7 +907,38 @@ public:
 private:
     double radius_;
     std::string color_;
-};`},{lang:"js",code:`// JS: no interfaces — mix behaviour with mixins or composition
+};`},{lang:"python",code:`from typing import Protocol
+from abc import ABC, abstractmethod
+
+class Printable(Protocol):
+    def print(self) -> None: ...
+
+class Loggable(Protocol):
+    def log(self, msg: str) -> None: ...
+
+# Combine protocols
+class PrintLoggable(Printable, Loggable, Protocol): ...
+
+# Abstract base classes for enforcement at instantiation
+class Shape(ABC):
+    @abstractmethod
+    def area(self) -> float: ...
+
+# class Bad(Shape): pass  # TypeError: can't instantiate
+`},{lang:"go",code:`type Reader interface { Read(p []byte) (n int, err error) }
+type Writer interface { Write(p []byte) (n int, err error) }
+
+// Interface composition — embed other interfaces
+type ReadWriter interface {
+    Reader
+    Writer
+}
+
+// Any type implementing both Read and Write satisfies ReadWriter
+type Buffer struct{ data []byte }
+func (b *Buffer) Read(p []byte) (int, error)  { /* ... */; return 0, nil }
+func (b *Buffer) Write(p []byte) (int, error) { /* ... */; return len(p), nil }
+`},{lang:"js",code:`// JS: no interfaces — mix behaviour with mixins or composition
 const ShapeMixin = (Base) => class extends Base {
     area() { throw new Error('area() not implemented'); }
 };
@@ -609,7 +973,44 @@ class Circle implements Shape, Colored {
 
     area(): number { return Math.PI * this.radius ** 2; }
     getColor(): string { return this.color; }
-}`}]},{id:"interface-vs-type",title:"interface vs type (TS)",tag:"similar",note:"TS only",panels:[{lang:"ts",code:`// interface: open (can be re-opened / merged)
+}`}]},{id:"interface-vs-type",title:"interface vs type (TS)",tag:"similar",note:"TS only",panels:[{lang:"python",code:`from typing import TypedDict, Protocol
+from dataclasses import dataclass
+
+# TypedDict: shape of a dict (like TS interface for data)
+class User(TypedDict):
+    id: int
+    name: str
+    email: str
+
+# Protocol: structural behaviour contract
+class Hashable(Protocol):
+    def __hash__(self) -> int: ...
+
+# dataclass: auto-generates __init__, __repr__, __eq__
+@dataclass
+class Point:
+    x: float
+    y: float
+`},{lang:"go",code:`// struct: data shape
+type User struct {
+    ID    int
+    Name  string
+    Email string
+}
+
+// interface: behaviour contract
+type Stringer interface {
+    String() string
+}
+
+// type alias
+type UserID = int
+
+// type definition (new distinct type)
+type Celsius float64
+type Fahrenheit float64
+// Can't accidentally mix Celsius and Fahrenheit — distinct types
+`},{lang:"ts",code:`// interface: open (can be re-opened / merged)
 interface User {
     id: number;
     name: string;
@@ -655,7 +1056,27 @@ private:
 };
 
 Box<std::string> strBox{"hello"};
-auto s = strBox.get();`},{lang:"js",code:`// JS: no generics — use JSDoc for IDE hints only
+auto s = strBox.get();`},{lang:"python",code:`from typing import TypeVar
+
+T = TypeVar("T")
+
+def first(items: list[T]) -> T:
+    return items[0]
+
+first([1, 2, 3])   # int
+first(["a", "b"])  # str
+
+# Python 3.12+ syntax:
+# def first[T](items: list[T]) -> T:
+#     return items[0]
+`},{lang:"go",code:`// Go generics (1.18+)
+func first[T any](items []T) T {
+    return items[0]
+}
+
+first([]int{1, 2, 3})   // 1 — int
+first([]string{"a"})    // "a" — string
+`},{lang:"js",code:`// JS: no generics — use JSDoc for IDE hints only
 /**
  * @template T
  * @param {T} value
@@ -712,7 +1133,33 @@ T sum(std::initializer_list<T> nums) {
 // Pre-C++20: SFINAE or static_assert
 template<typename T,
          typename = std::enable_if_t<std::is_arithmetic_v<T>>>
-T square(T x) { return x * x; }`},{lang:"js",code:`// No constraints — runtime checks only
+T square(T x) { return x * x; }`},{lang:"python",code:`from typing import TypeVar
+
+# Bound TypeVar — T must be int or float
+Numeric = TypeVar("Numeric", int, float)
+
+def add(a: Numeric, b: Numeric) -> Numeric:
+    return a + b
+
+add(1, 2)      # 3   — int
+add(1.5, 2.5)  # 4.0 — float
+# add("a", "b")  # type error
+`},{lang:"go",code:`import "golang.org/x/exp/constraints"
+
+// Constrain T to numeric types
+func add[T constraints.Number](a, b T) T {
+    return a + b
+}
+
+add(1, 2)          // 3
+add(1.5, 2.5)      // 4.0
+
+// Custom constraint interface
+type Stringer interface {
+    String() string
+}
+func print[T Stringer](v T) { fmt.Println(v.String()) }
+`},{lang:"js",code:`// No constraints — runtime checks only
 function max(a, b) {
     if (typeof a !== typeof b)
         throw new TypeError('types must match');
@@ -730,7 +1177,40 @@ function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
 const user = { name: 'Alice', age: 30 };
 getProperty(user, 'name'); // string
 getProperty(user, 'age');  // number
-// getProperty(user, 'x'); // compile error`}]},{id:"generics-utility-types",title:"Utility Types (TS)",tag:"breaking",note:"TS only",panels:[{lang:"ts",code:`interface User {
+// getProperty(user, 'x'); // compile error`}]},{id:"generics-utility-types",title:"Utility Types (TS)",tag:"breaking",note:"TS only",panels:[{lang:"python",code:`from typing import Optional, Union, Callable
+
+# Optional[X] is shorthand for Union[X, None]
+def find(items: list[str], key: str) -> Optional[str]:
+    return next((i for i in items if i == key), None)
+
+# Union — accept multiple types
+def parse(raw: Union[str, int]) -> str:
+    return str(raw)
+
+# Callable[[arg_types], return_type]
+def apply(fn: Callable[[int], int], x: int) -> int:
+    return fn(x)
+`},{lang:"go",code:`// Go standard library generics
+// maps.Keys, slices.Contains, etc. (Go 1.21+)
+import "slices"
+
+// Optional via pointer (nil = absent)
+func find(items []string, key string) *string {
+    for _, v := range items {
+        if v == key { return &v }
+    }
+    return nil
+}
+
+// Functional helpers using generics
+func Map[T, U any](items []T, f func(T) U) []U {
+    result := make([]U, len(items))
+    for i, v := range items {
+        result[i] = f(v)
+    }
+    return result
+}
+`},{lang:"ts",code:`interface User {
     id: number;
     name: string;
     email: string;
@@ -784,7 +1264,27 @@ try {
 // C++ has no finally — use RAII or scope_exit
 {
     std::ifstream file("data.txt");
-    // file closes automatically when scope exits`},{lang:"js",code:`try {
+    // file closes automatically when scope exits`},{lang:"python",code:`try:
+    result = int("abc")
+except ValueError as e:
+    print(f"parse error: {e}")
+except (TypeError, RuntimeError) as e:
+    print(f"other error: {e}")
+else:
+    print("no error")  # runs if no exception
+finally:
+    print("always runs")
+`},{lang:"go",code:`// Go uses multiple return values — no exceptions
+result, err := strconv.Atoi("abc")
+if err != nil {
+    fmt.Printf("parse error: %v\\n", err)
+    return
+}
+fmt.Println(result)
+
+// defer runs on function exit (like finally)
+defer func() { fmt.Println("always runs") }()
+`},{lang:"js",code:`try {
     const result = JSON.parse(badJson);
 } catch (err) {
     // err can be anything — no type guarantee
@@ -843,7 +1343,41 @@ private:
 };
 
 // Throw and catch
-throw ValidationError("email", "invalid format");`},{lang:"js",code:`class ValidationError extends Error {
+throw ValidationError("email", "invalid format");`},{lang:"python",code:`class ValidationError(Exception):
+    def __init__(self, field: str, message: str) -> None:
+        self.field = field
+        super().__init__(f"{field}: {message}")
+
+class NotFoundError(Exception):
+    pass
+
+def find_user(user_id: int) -> dict:
+    if user_id <= 0:
+        raise ValidationError("id", "must be positive")
+    raise NotFoundError(f"user {user_id} not found")
+`},{lang:"go",code:`import "errors"
+import "fmt"
+
+// Sentinel errors for type-checking with errors.Is
+var ErrNotFound = errors.New("not found")
+
+// Structured error with context
+type ValidationError struct {
+    Field   string
+    Message string
+}
+
+func (e *ValidationError) Error() string {
+    return fmt.Sprintf("%s: %s", e.Field, e.Message)
+}
+
+func findUser(id int) error {
+    if id <= 0 {
+        return &ValidationError{Field: "id", Message: "must be positive"}
+    }
+    return fmt.Errorf("user %d: %w", id, ErrNotFound)
+}
+`},{lang:"js",code:`class ValidationError extends Error {
     constructor(field, message) {
         super(message);
         this.name = 'ValidationError';
@@ -907,7 +1441,46 @@ if (result) {
     std::cout << *result;
 } else {
     std::cerr << result.error();
-}`},{lang:"js",code:`// Common pattern: return [error, value] tuple
+}`},{lang:"python",code:`from dataclasses import dataclass
+from typing import Generic, TypeVar, Union
+
+T = TypeVar("T")
+E = TypeVar("E", bound=BaseException)
+
+@dataclass
+class Ok(Generic[T]):
+    value: T
+
+@dataclass
+class Err(Generic[E]):
+    error: E
+
+Result = Union[Ok[T], Err[E]]
+
+def divide(a: float, b: float) -> Result:
+    if b == 0:
+        return Err(ZeroDivisionError("cannot divide by zero"))
+    return Ok(a / b)
+
+match divide(10, 2):
+    case Ok(value=v): print(f"result: {v}")
+    case Err(error=e): print(f"error: {e}")
+`},{lang:"go",code:`// Go's idiomatic Result pattern: (T, error)
+func divide(a, b float64) (float64, error) {
+    if b == 0 {
+        return 0, errors.New("cannot divide by zero")
+    }
+    return a / b, nil
+}
+
+// Usage — must check error explicitly
+result, err := divide(10, 2)
+if err != nil {
+    fmt.Printf("error: %v\\n", err)
+    return
+}
+fmt.Printf("result: %v\\n", result)
+`},{lang:"js",code:`// Common pattern: return [error, value] tuple
 function parseNumber(s) {
     const n = Number(s);
     if (isNaN(n)) return [new Error('not a number'), null];
@@ -963,7 +1536,20 @@ try {
 } catch (const std::exception& e) {
     std::cerr << "Failed: " << e.what() << "
 ";
-}`},{lang:"js",code:`// Promise
+}`},{lang:"python",code:`import asyncio
+
+# Python uses coroutines instead of Promises
+async def fetch_data() -> str:
+    await asyncio.sleep(1)  # non-blocking pause
+    return "data"
+
+# asyncio.gather = Promise.all
+async def main() -> None:
+    a, b = await asyncio.gather(fetch_data(), fetch_data())
+    print(a, b)
+
+asyncio.run(main())
+`},{lang:"js",code:`// Promise
 const promise = new Promise((resolve, reject) => {
     setTimeout(() => resolve('done'), 1000);
 });
@@ -1009,7 +1595,20 @@ cppcoro::task<void> run() {
     auto user = co_await fetchUser(1);
     std::cout << user << "
 ";
-}`},{lang:"js",code:`async function loadProfile(userId) {
+}`},{lang:"python",code:`import asyncio
+import aiohttp  # third-party async HTTP client
+
+async def get_user(user_id: int) -> dict:
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"/api/users/{user_id}") as resp:
+            return await resp.json()
+
+async def main() -> None:
+    user = await get_user(1)
+    print(user["name"])
+
+asyncio.run(main())
+`},{lang:"js",code:`async function loadProfile(userId) {
     try {
         const user  = await fetchUser(userId);
         const posts = await fetchPosts(userId);
@@ -1055,7 +1654,28 @@ auto f = std::async(std::launch::async, []() {
 
 try {
     int val = f.get(); // exception re-thrown here
-} catch (const std::runtime_error& e) { ... }`},{lang:"js",code:`// Unhandled promise rejections are a common gotcha
+} catch (const std::runtime_error& e) { ... }`},{lang:"python",code:`import asyncio
+
+async def risky() -> str:
+    await asyncio.sleep(0.1)
+    raise ConnectionError("network timeout")
+
+async def main() -> None:
+    # Single await with try/except
+    try:
+        result = await risky()
+    except ConnectionError as e:
+        print(f"caught: {e}")
+
+    # gather with return_exceptions=True — like Promise.allSettled
+    results = await asyncio.gather(
+        risky(), risky(),
+        return_exceptions=True,
+    )
+    for r in results:
+        if isinstance(r, Exception):
+            print(f"error: {r}")
+`},{lang:"js",code:`// Unhandled promise rejections are a common gotcha
 // BAD — rejection swallowed silently
 async function bad() {
     fetchData(); // no await, no catch
