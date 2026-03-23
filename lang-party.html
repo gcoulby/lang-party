@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lang.party — Java & C++ → JS/TS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@400;600;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0c0d0f;
+    --surface:   #13151a;
+    --surface2:  #1b1e26;
+    --border:    #252832;
+    --border2:   #2e3240;
+    --text:      #c9cdd6;
+    --muted:     #5a6075;
+    --accent:    #e2ff5c;
+    --accent2:   #5cffe4;
+    --accent3:   #ff6b6b;
+    --java:      #f89820;
+    --cpp:       #00599c;
+    --js:        #f7df1e;
+    --ts:        #3178c6;
+    --keyword:   #c792ea;
+    --string:    #c3e88d;
+    --comment:   #546e7a;
+    --number:    #f78c6c;
+    --type:      #82aaff;
+    --fn:        #82aaff;
+    --op:        #89ddff;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { font-size: 14px; scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(12,13,15,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    height: 56px;
+  }
+
+  .logo {
+    font-family: 'Syne Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
+  }
+  .logo span { color: var(--muted); }
+
+  .header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+
+  .pill-group {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .pill {
+    padding: 0.3rem 0.75rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .pill:hover { color: var(--text); background: var(--surface2); }
+
+  .pill.active[data-lang="java"] { background: var(--java); color: #000; }
+  .pill.active[data-lang="cpp"]  { background: var(--cpp);  color: #fff; }
+  .pill.active[data-ts]          { background: var(--ts);   color: #fff; }
+  .pill.active[data-js]          { background: var(--js);   color: #000; }
+  .pill.active:not([data-lang]):not([data-ts]):not([data-js]) {
+    background: var(--accent); color: #000;
+  }
+
+  /* ── Layout ── */
+  .shell {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: calc(100vh - 56px);
+  }
+
+  /* ── Sidebar ── */
+  nav {
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 0;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    background: var(--surface);
+  }
+
+  nav::-webkit-scrollbar { width: 4px; }
+  nav::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  .nav-section {
+    padding: 0 1rem 1rem;
+  }
+
+  .nav-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.5rem 0.5rem 0.4rem;
+    display: block;
+  }
+
+  .nav-item {
+    display: block;
+    padding: 0.35rem 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text);
+    cursor: pointer;
+    border-radius: 4px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    transition: all 0.12s;
+  }
+
+  .nav-item:hover { background: var(--surface2); color: var(--accent); }
+  .nav-item.active { background: var(--surface2); color: var(--accent); border-left: 2px solid var(--accent); padding-left: calc(0.5rem - 2px); }
+
+  /* ── Main ── */
+  main { padding: 2rem 2.5rem; max-width: 1280px; }
+
+  /* ── Section ── */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .section-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.1;
+  }
+
+  .section-desc {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  /* ── Concept card ── */
+  .concept {
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .concept-header {
+    padding: 0.75rem 1rem;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .concept-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .concept-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-left: auto;
+    font-style: italic;
+  }
+
+  /* ── Diff pill ── */
+  .diff-pill {
+    font-size: 0.62rem;
+    font-family: 'DM Mono', monospace;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .diff-pill.breaking   { background: rgba(255,107,107,0.15); color: var(--accent3); border: 1px solid rgba(255,107,107,0.3); }
+  .diff-pill.similar    { background: rgba(92,255,228,0.1);   color: var(--accent2); border: 1px solid rgba(92,255,228,0.25); }
+  .diff-pill.gotcha     { background: rgba(226,255,92,0.1);   color: var(--accent);  border: 1px solid rgba(226,255,92,0.25); }
+
+  /* ── Code panels ── */
+  .panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* each column can scroll independently — no squishing */
+    overflow: hidden;
+  }
+
+  .panel {
+    border-right: 1px solid var(--border);
+    min-width: 0; /* prevent grid blowout */
+    overflow: hidden;
+  }
+  .panel:last-child { border-right: none; }
+
+  .panel-header {
+    padding: 0.5rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0,0,0,0.15);
+  }
+
+  .lang-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-java { background: var(--java); }
+  .dot-cpp  { background: var(--cpp); }
+  .dot-js   { background: var(--js); }
+  .dot-ts   { background: var(--ts); }
+
+  .lang-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  pre {
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.85;
+    color: var(--text);
+    tab-size: 2;
+    white-space: pre;        /* never wrap — scroll instead */
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+
+  pre::-webkit-scrollbar { height: 4px; }
+  pre::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  pre::-webkit-scrollbar-track { background: transparent; }
+
+  /* syntax */
+  .kw  { color: var(--keyword); }
+  .st  { color: var(--string); }
+  .cm  { color: var(--comment); font-style: italic; }
+  .nm  { color: var(--number); }
+  .ty  { color: var(--type); }
+  .fn  { color: #82aaff; }
+  .op  { color: var(--op); }
+  .pl  { color: #f78c6c; }
+
+  /* ── Callout ── */
+  .callout {
+    margin: 1.5rem 0;
+    padding: 0.85rem 1rem;
+    border-radius: 6px;
+    border-left: 3px solid;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .callout.warn  { background: rgba(226,255,92,0.05);  border-color: var(--accent);  color: #b8cc4e; }
+  .callout.info  { background: rgba(92,255,228,0.05);  border-color: var(--accent2); color: #4fccbb; }
+  .callout.alert { background: rgba(255,107,107,0.05); border-color: var(--accent3); color: #cc5555; }
+
+  .callout strong { color: #fff; font-weight: 500; }
+
+  /* ── Table ── */
+  .equiv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    margin: 1.5rem 0;
+  }
+
+  .equiv-table th {
+    padding: 0.5rem 0.75rem;
+    background: var(--surface2);
+    color: var(--muted);
+    text-align: left;
+    letter-spacing: 0.08em;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .equiv-table td {
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .equiv-table tr:last-child td { border-bottom: none; }
+  .equiv-table tr:hover td { background: var(--surface2); }
+
+  .equiv-table td:first-child { color: var(--java); }
+  .equiv-table td:nth-child(2) { color: var(--cpp); }
+  .equiv-table td:nth-child(3) { color: var(--js); }
+  .equiv-table td:nth-child(4) { color: var(--ts); }
+  .equiv-table td:last-child { color: var(--muted); font-style: italic; font-size: 0.7rem; }
+
+  /* Single-source table (no CPP) */
+  .equiv-table.java-only td:first-child { color: var(--java); }
+  .equiv-table.java-only td:nth-child(2) { color: var(--js); }
+  .equiv-table.java-only td:nth-child(3) { color: var(--ts); }
+  .equiv-table.java-only td:last-child { color: var(--muted); }
+
+  /* ── Source toggle: hide/show panels ── */
+  body.source-java  .panel-cpp  { display: none; }
+  body.source-cpp   .panel-java { display: none; }
+  body.source-both  .panels     { grid-template-columns: 1fr 1fr 1fr; }
+
+  body.source-java  .panels     { grid-template-columns: 1fr 1fr; }
+  body.source-cpp   .panels     { grid-template-columns: 1fr 1fr; }
+
+  /* ── TS/JS toggle ── */
+  body.use-js  .ts-only { display: none; }
+  body.use-ts  .js-only { display: none; }
+
+  /* panel target hide */
+  body.use-js  .panel-ts { display: none; }
+  body.use-ts  .panel-js { display: none; }
+
+  /* when one target panel hidden, expand remaining */
+  body.use-js .panels,
+  body.use-ts .panels {
+    /* handled by explicit grid rules below overriding as needed */
+  }
+
+  /* ── Ecosystem row ── */
+  .eco-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .eco-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .eco-from {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 0.25rem;
+  }
+
+  .eco-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+
+  .eco-to {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .eco-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    color: var(--accent2);
+  }
+
+  .eco-note {
+    margin-top: 0.5rem;
+    font-size: 0.72rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── Differences list ── */
+  .diff-list { list-style: none; margin: 1rem 0; }
+  .diff-list li {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+    align-items: start;
+  }
+  .diff-list li:last-child { border-bottom: none; }
+  .diff-key { font-family: 'DM Mono', monospace; color: var(--accent); font-size: 0.72rem; }
+  .diff-val { color: var(--text); line-height: 1.5; }
+  .diff-val em { color: var(--muted); font-style: normal; }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .shell { grid-template-columns: 1fr; }
+    nav { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+    main { padding: 1.5rem; }
+    .panels { grid-template-columns: 1fr !important; }
+    .panel { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body class="source-java use-ts">
+
+<header>
+  <div class="logo">lang<span>.</span>party</div>
+
+  <div class="header-controls">
+    <!-- Source language -->
+    <div class="pill-group" id="source-group">
+      <button class="pill active" data-lang="java" onclick="setSource('java')">Java</button>
+      <button class="pill" data-lang="cpp" onclick="setSource('cpp')">C++</button>
+      <button class="pill" onclick="setSource('both')">Both</button>
+    </div>
+
+    <!-- Target: JS vs TS -->
+    <div class="pill-group" id="target-group">
+      <button class="pill" data-js onclick="setTarget('js')">JavaScript</button>
+      <button class="pill active" data-ts onclick="setTarget('ts')">TypeScript</button>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+
+  <!-- ── Sidebar nav ── -->
+  <nav>
+    <div class="nav-section">
+      <span class="nav-label">Language Basics</span>
+      <button class="nav-item active" onclick="goto('variables')">Variables & Types</button>
+      <button class="nav-item" onclick="goto('functions')">Functions</button>
+      <button class="nav-item" onclick="goto('classes')">Classes & OOP</button>
+      <button class="nav-item" onclick="goto('interfaces')">Interfaces / Contracts</button>
+      <button class="nav-item" onclick="goto('generics')">Generics / Templates</button>
+      <button class="nav-item" onclick="goto('errors')">Error Handling</button>
+      <button class="nav-item" onclick="goto('async')">Async & Concurrency</button>
+      <button class="nav-item" onclick="goto('collections')">Collections</button>
+      <button class="nav-item" onclick="goto('modules')">Modules & Packages</button>
+    </div>
+    <div class="nav-section">
+      <span class="nav-label">Key Differences</span>
+      <button class="nav-item" onclick="goto('conceptual')">Conceptual Gaps</button>
+      <button class="nav-item" onclick="goto('gotchas')">Gotchas</button>
+    </div>
+    <div class="nav-section">
+      <span class="nav-label">Ecosystem</span>
+      <button class="nav-item" onclick="goto('ecosystem')">Tool Equivalents</button>
+      <button class="nav-item" onclick="goto('frameworks')">UI Frameworks</button>
+    </div>
+  </nav>
+
+  <!-- ── Main ── -->
+  <main>
+
+    <!-- ════════════════════════════════
+         VARIABLES & TYPES
+    ════════════════════════════════ -->
+    <section class="section active" id="s-variables">
+      <div class="section-header">
+        <div class="section-tag">Language Basics</div>
+        <div class="section-title">Variables &amp; Types</div>
+        <div class="section-desc">JS/TS uses dynamic typing by default. TypeScript adds a structural type system on top — it's checked at compile time only, the runtime is still plain JS.</div>
+      </div>
+
+      <!-- Declaration -->
+      <div class="concept">
+        <div class="concept-header">
+          <span class="concept-title">Variable Declaration</span>
+          <span class="diff-pill breaking">breaking difference</span>
+        </div>
+        <div class="panels">
+          <div class="panel panel-java">
+            <div class="panel-header"><span class="lang-dot dot-java"></span><span class="lang-name">Java</span></div>
+            <pre><span class="kw">int</span> count = <span class="nm">0</span>;
+<span class="kw">final</span> <span class="ty">String</span> name = <span class="st">"atlas"</span>;
+<span class="ty">List</span>&lt;<span class="ty">String</span>&gt; items = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+
+<span class="cm">// var available since Java 10 (local only)</span>
+<span class="kw">var</span> inferred = <span class="nm">42</span>;</pre>
+          </div>
+          <div class="panel panel-cpp">
+            <div class="panel-header"><span class="lang-dot dot-cpp"></span><span class="lang-name">C++</span></div>
+            <pre><span class="kw">int</span> count = <span class="nm">0</span>;
+<span class="kw">const</span> std::string name = <span class="st">"atlas"</span>;
+std::vector&lt;std::string&gt; items;
+
+<span class="cm">// auto since C++11</span>
+<span class="kw">auto</span> inferred = <span class="nm">42</span>;</pre>
+          </div>
+          <div class="panel panel-js js-only">
+            <div class="panel-header"><span class="lang-dot dot-js"></span><span class="lang-name">JavaScript</span></div>
+            <pre><span class="kw">let</span> count = <span class="nm">0</span>;              <span class="cm">// mutable, block-scoped</span>
+<span class="kw">const</span> name = <span class="st">"atlas"</span>;       <span class="cm">// immutable binding</span>
+<span class="kw">const</span> items = [];
+
+<span class="cm">// no type annotation — inferred at runtime</span>
+<span class="kw">let</span> inferred = <span class="nm">42</span>;</pre>
+          </div>
+          <div class="panel panel-ts ts-only">
+            <div class="panel-header"><span class="lang-dot dot-ts"></span><span class="lang-name">TypeScript</span></div>
+            <pre><span class="kw">let</span> count<span class="op">:</span> <span class="ty">number</span> = <span class="nm">0</span>;
+<span class="kw">const</span> name<span class="op">:</span> <span class="ty">string</span> = <span class="st">"atlas"</span>;
+<span class="kw">const</span> items<span class="op">:</span> <span class="ty">string</span>[] = [];
+
+<span class="cm">// type inferred — annotation optional here</span>
+<span class="kw">let</span> inferred = <span class="nm">42</span>; <span class="cm">// : number</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Primitive types -->
+      <div class="concept">
+        <div class="concept-header">
+          <span class="concept-title">Primitive Types</span>
+          <span class="diff-pill breaking">breaking difference</span>
+          <span class="concept-note">JS has one number type for everything</span>
+        </div>
+        <div class="panels">
+          <div class="panel panel-java">
+            <div class="panel-header"><span class="lang-dot dot-java"></span><span class="lang-name">Java</span></div>
+            <pre><span class="kw">int</span>     i = <span class="nm">42</span>;
+<span class="kw">long</span>    l = <span class="nm">9_000_000_000L</span>;
+<span class="kw">double</span>  d = <span class="nm">3.14</span>;
+<span class="kw">boolean</span> b = <span class="kw">true</span>;
+<span class="kw">char</span>    c = <span class="st">'x'</span>;
+<span class="ty">String</span>  s = <span class="st">"text"</span>; <span class="cm">// object, not primitive</span></pre>
+          </div>
+          <div class="panel panel-cpp">
+            <div class="panel-header"><span class="lang-dot dot-cpp"></span><span class="lang-name">C++</span></div>
+            <pre><span class="kw">int</span>          i = <span class="nm">42</span>;
+<span class="kw">long long</span>    l = <span class="nm">9000000000LL</span>;
+<span class="kw">double</span>       d = <span class="nm">3.14</span>;
+<span class="kw">bool</span>         b = <span class="kw">true</span>;
+<span class="kw">char</span>         c = <span class="st">'x'</span>;
+std::string  s = <span class="st">"text"</span>;</pre>
+          </div>
+          <div class="panel panel-js js-only">
+            <div class="panel-header"><span class="lang-dot dot-js"></span><span class="lang-name">JavaScript</span></div>
+            <pre><span class="cm">// ONE number type — no int/float/double</span>
+<span class="kw">let</span> i = <span class="nm">42</span>;          <span class="cm">// number</span>
+<span class="kw">let</span> d = <span class="nm">3.14</span>;        <span class="cm">// also number</span>
+<span class="kw">let</span> b = <span class="kw">true</span>;        <span class="cm">// boolean</span>
+<span class="kw">let</span> s = <span class="st">"text"</span>;      <span class="cm">// string (primitive)</span>
+<span class="kw">let</span> big = <span class="nm">9n</span>;        <span class="cm">// BigInt for large integers</span>
+<span class="kw">let</span> n = <span class="kw">null</span>;        <span class="cm">// intentional empty</span>
+<span class="kw">let</span> u;               <span class="cm">// undefined — not assigned</span></pre>
+          </div>
+          <div class="panel panel-ts ts-only">
+            <div class="panel-header"><span class="lang-dot dot-ts"></span><span class="lang-name">TypeScript</span></div>
+            <pre><span class="cm">// ONE number type — no int/float/double</span>
+<span class="kw">let</span> i<span class="op">:</span> <span class="ty">number</span> = <span class="nm">42</span>;
+<span class="kw">let</span> d<span class="op">:</span> <span class="ty">number</span> = <span class="nm">3.14</span>;
+<span class="kw">let</span> b<span class="op">:</span> <span class="ty">boolean</span> = <span class="kw">true</span>;
+<span class="kw">let</span> s<span class="op">:</span> <span class="ty">string</span> = <span class="st">"text"</span>;
+<span class="kw">let</span> big<span class="op">:</span> <span class="ty">bigint</span> = <span class="nm">9n</span>;
+<span class="kw">let</span> n<span class="op">:</span> <span class="ty">null</span> = <span class="kw">null</span>;
+<span class="kw">let</span> u<span class="op">:</span> <span class="ty">undefined</span> = <span class="kw">undefined</span>;</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <strong>⚠ null vs undefined</strong> — JS has both. <code>null</code> means "intentionally empty". <code>undefined</code> means "never set". You'll encounter both. TypeScript's strict mode makes the compiler catch unhandled cases.
+      </div>
+
+      <!-- Union types -->
+      <div class="concept">
+        <div class="concept-header">
+          <span class="concept-title">Union / Optional Types</span>
+          <span class="diff-pill similar">similar concept</span>
+        </div>
+        <div class="panels">
+          <div class="panel panel-java">
+            <div class="panel-header"><span class="lang-dot dot-java"></span><span class="lang-name">Java</span></div>
+            <pre><span class="ty">Optional</span>&lt;<span class="ty">String</span>&gt; maybeStr = <span class="ty">Optional</span>.<span class="fn">of</span>(<span class="st">"hello"</span>);
+maybeStr.<span class="fn">ifPresent</span>(v <span class="op">-></span> <span class="ty">System</span>.out.<span class="fn">println</span>(v));</pre>
+          </div>
+          <div class="panel panel-cpp">
+            <div class="panel-header"><span class="lang-dot dot-cpp"></span><span class="lang-name">C++</span></div>
+            <pre>std::optional&lt;std::string&gt; maybeStr = <span class="st">"hello"</span>;
+<span class="kw">if</span> (maybeStr) {
+  std::cout &lt;&lt; *maybeStr;
+}</pre>
+          </div>
+          <div class="panel panel-js js-only">
+            <div class="panel-header"><span class="lang-dot dot-js"></span><span class="lang-name">JavaScript</span></div>
+            <pre><span class="cm">// no built-in optional type — use null/undefined</span>
+<span class="kw">const</span> maybeStr = <span class="st">"hello"</span>; <span class="cm">// or null</span>
+<span class="kw">if</span> (maybeStr) {
+  console.<span class="fn">log</span>(maybeStr);
+}
+<span class="cm">// optional chaining: obj?.prop?.nested</span></pre>
+          </div>
+          <div class="panel panel-ts ts-only">
+            <div class="panel-header"><span class="lang-dot dot-ts"></span><span class="lang-name">TypeScript</span></div>
+            <pre><span class="cm">// union type replaces Optional&lt;T&gt;</span>
+<span class="kw">let</span> maybeStr<span class="op">:</span> <span class="ty">string</span> <span class="op">|</span> <span class="ty">null</span> = <span class="st">"hello"</span>;
+<span class="kw">if</span> (maybeStr <span class="op">!==</span> <span class="kw">null</span>) {
+  console.<span class="fn">log</span>(maybeStr); <span class="cm">// narrowed to string</span>
+}
+<span class="cm">// shorthand optional param: value?: string</span></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         FUNCTIONS
+    ════════════════════════════════ -->
+    <section class="section" id="s-functions">
+      <div class="section-header">
+        <div class="section-tag">Language Basics</div>
+        <div class="section-title">Functions</div>
+        <div class="section-desc">Functions are first-class values in JS/TS. They can be passed, stored, and returned like any other value — no functional interface boilerplate needed.</div>
+      </div>
+
+      <div class="concept">
+        <div class="concept-header">
+          <span class="concept-title">Function Declaration</span>
+          <span class="diff-pill similar">similar concept</span>
+        </div>
+        <div class="panels">
+          <div class="panel panel-java">
+            <div class="panel-header"><span class="lang-dot dot-java"></span><span class="lang-name">Java</span></div>
+            <pre><span class="kw">public</span> <span class="ty">String</span> <span class="fn">greet</span>(<span class="ty">String</span> name) {
+  <span class="kw">return</span> <span class="st">"Hello, "</span> + name;
+}
+
+<span class="cm">// static method</span>
+<span class="kw">public static</span> <span class="kw">int</span> <span class="fn">add</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) {
+  <span class="kw">return</span> a + b;
+}</pre>
+          </div>
+          <div class="panel panel-cpp">
+            <div class="panel-header"><span class="lang-dot dot-cpp"></span><span class="lang-name">C++</span></div>
+            <pre>std::string <span class="fn">greet</span>(std::string name) {
+  <span class="kw">return</span> <span class="st">"Hello, "</span> + name;
+}
+
+<span class="kw">int</span> <span class="fn">add</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) {
+  <span class="kw">return</span> a + b;
+}</pre>
+          </div>
+          <div class="panel panel-js js-only">
+            <div class="panel-header"><span class="lang-dot dot-js"></span><span class="lang-name">JavaScript</span></div>
+            <pre><span class="kw">function</span> <span class="fn">greet</span>(name) {
+  <span class="kw">return</span> <span class="st">`Hello, </span><span class="op">${</span>name<span class="op">}</span><span class="st">`</span>;
+}
+
+<span class="cm">// arrow function (no own `this`)</span>
+<span class="kw">const</span> add = (a, b) <span class="op">=></span> a + b;
+
+<span class="cm">// default params</span>
+<span class="kw">function</span> <span class="fn">inc</span>(n, by = <span class="nm">1</span>) {
+  <span class="kw">return</span> n + by;
+}</pre>
+          </div>
+          <div class="panel panel-ts ts-only">
+            <div class="panel-header"><span class="lang-dot dot-ts"></span><span class="lang-name">TypeScript</span></div>
+            <pre><span class="kw">function</span> <span class="fn">greet</span>(name<span class="op">:</span> <span class="ty">string</span>)<span class="op">:</span> <span class="ty">string</span> {
+  <span class="kw">return</span> <span class="st">`Hello, </span><span class="op">${</span>name<span class="op">}</span><span class="st">`</span>;
+}
+
+<span class="cm">// arrow function</span>
+<span class="kw">const</span> add = (a<span class="op">:</span> <span class="ty">number</span>, b<span class="op">:</span> <span class="ty">number</span>)<span class="op">:</span> <span class="ty">number</span> <span class="op">=></span> a + b;
+
+<span class="cm">// default + optional params</span>
+<span class="kw">function</span> <span class="fn">inc</span>(n<span class="op">:</span> <span class="ty">number</span>, by<span class="op">:</span> <span class="ty">number</span> = <span class="nm">1</span>)<span class="op">:</span> <span class="ty">number</span> {
+  <span class="kw">return</span> n + by;
+}</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="concept">
+        <div class="concept-header">
+          <span class="concept-title">Functions as Values (Lambdas)</span>
+          <span class="diff-pill breaking">breaking difference</span>
+          <span class="concept-note">No SAM / functional interface needed</span>
+        </div>
+        <div class="panels">
+          <div class="panel panel-java">
+            <div class="panel-header"><span class="lang-dot dot-java"></span><span class="lang-name">Java</span></div>
+            <pre><span class="ty">Function</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; len = s <span class="op">-></span> s.<span class="fn">length</span>();
+
+<span class="ty">List</span>&lt;<span class="ty">String</span>&gt; names = <span class="ty">List</span>.<span class="fn">of</span>(<span class="st">"bob"</span>, <span class="st">"alice"</span>);
+names.<span class="fn">stream</span>()
+  .<span class="fn">map</span>(s <span class="op">-></span> s.<span class="fn">toUpperCase</span>())
+  .<span class="fn">forEach</span>(<span class="ty">System</span>.out<span class="op">::</span><span class="fn">println</span>);</pre>
+          </div>
+          <div class="panel panel-cpp">
+            <div class="panel-header"><span class="lang-dot dot-cpp"></span><span class="lang-name">C++</span></div>
+            <pre>std::<span class="fn">function</span>&lt;<span class="kw">int</span>(std::string)&gt; len
+  = [](std::string s) { <span class="kw">return</span> s.<span class="fn">length</span>(); };
+
+std::vector&lt;std::string&gt; names = {<span class="st">"bob"</span>, <span class="st">"alice"</span>};
+std::for_each(names.<span class="fn">begin</span>(), names.<span class="fn">end</span>(),
+  [](std::string& s) { std::cout &lt;&lt; s &lt;&lt; <span class="st">"\n"</span>; });</pre>
+          </div>
+          <div class="panel panel-js js-only">
+            <div class="panel-header"><span class="lang-dot dot-js"></span><span class="lang-name">JavaScript</span></div>
+            <pre><span class="cm">// functions are plain values, no wrapper type</span>
+<span class="kw">const</span> len = s <span class="op">=></span> s.length;
+
+<span class="kw">const</span> names = [<span class="st">"bob"</span>, <span class="st">"alice"</span>];
+names
+  .<span class="fn">map</span>(s <span class="op">=></span> s.<span class="fn">toUpperCase</span>())
+  .<span class="fn">forEach</span>(s <span class="op">=></span> console.<span class="fn">log</span>(s));</pre>
+          </div>
+          <div class="panel panel-ts ts-only">
+            <div class="panel-header"><span class="lang-dot dot-ts"></span><span class="lang-name">TypeScript</span></div>
+            <pre><span class="cm">// function type inline, no interface needed</span>
+<span class="kw">const</span> len<span class="op">:</span> (s<span class="op">:</span> <span class="ty">string</span>) <span class="op">=></span> <span class="ty">number</span> = s <span class="op">=></span> s.length;
+
+<span class="kw">const</span> names<span class="op">:</span> <span class="ty">string</span>[] = [<span class="st">"bob"</span>, <span class="st">"alice"</span>];
+names
+  .<span class="fn">map</span>(s <span class="op">=></span> s.<span class="fn">toUpperCase</span>())
+  .<span class="fn">forEach</span>(s <span class="op">=></span> console.<span class="fn">log</span>(s));</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout alert">
+        <strong>⚠ Arrow functions and <code>this</code></strong> — Arrow functions do <em>not</em> have their own <code>this</code>. They capture the <code>this</code> of the surrounding scope. Regular <code>function</code> declarations have their own <code>this</code>, which changes based on how they're called. This is a major source of bugs for Java/C++ devs.
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         CLASSES & OOP
+    ════════════════════════════════ -->
+    <section class="section" id="s-classes">
+      <div class="section-header">
+        <div class="section-tag">Language Basics</div>
+        <div class="section-title">Classes &amp; OOP</div>
+        <div class="section-desc">JS classes are syntax sugar over prototype chains. The mental model is different even if the syntax looks familiar.</div>
+      </div>
+
+      <div class="concept">
+        <div class="concept-header">
+          <span class="concept-title">Class Definition</span>
+          <span class="diff-pill similar">similar syntax</span>
+          <span class="concept-note">different runtime model</span>
+        </div>
+        <div class="panels">
+          <div class="panel panel-java">
+            <div class="panel-header"><span class="lang-dot dot-java"></span><span class="lang-name">Java</span></div>
+            <pre><span class="kw">public class</span> <span class="ty">Animal</span> {
+  <span class="kw">private final</span> <span class="ty">String</span> name;
+
+  <span class="kw">public</span> <span class="fn">Animal</span>(<span class="ty">String</span> name) {
+    <span class="kw">this</span>.name = name;
+  }
+
+  <span class="kw">public</span> <span class="ty">String</span> <span class="fn">speak</span>() {
+    <span class="kw">return</span> <span class="kw">this</span>.name + <span class="st">" says ..."</span>;
+  }
+}</pre>
+          </div>
+          <div class="panel panel-cpp">
+            <div class="panel-header"><span class="lang-dot dot-cpp"></span><span class="lang-name">C++</span></div>
+            <pre><span class="kw">class</span> <span class="ty">Animal</span> {
+  std::string name;
+<span class="kw">public</span>:
+  <span class="fn">Animal</span>(std::string n) <span class="op">:</span> name(n) {}
+
+  std::string <span class="fn">speak</span>() {
+    <span class="kw">return</span> name + <span class="st">" says ..."</span>;
+  }
+};</pre>
+          </div>
+          <div class="panel panel-js js-only">
+            <div class="panel-header"><span class="lang-dot dot-js"></span><span class="lang-name">JavaScript</span></div>
+            <pre><span class="kw">class</span> <span class="ty">Animal</span> {
+  <span class="cm">// private field (modern JS)</span>
+  #name;
+
+  <span class="fn">constructor</span>(name) {
+    <span class="kw">this</span>.#name = name;
+  }
+
+  <span class="fn">speak</span>() {
+    <span class="kw">return</span> <span class="st">`</span><span class="op">${</span><span class="kw">this</span>.#name<span class="op">}</span><span class="st"> says ...`</span>;
+  }
+}</pre>
+          </div>
+          <div class="panel panel-ts ts-only">
+            <div class="panel-header"><span class="lang-dot dot-ts"></span><span class="lang-name">TypeScript</span></div>
+            <pre><span class="kw">class</span> <span class="ty">Animal</span> {
+  <span class="kw">constructor</span>(<span class="kw">private readonly</span> name<span class="op">:</span> <span class="ty">string</span>) {}
+  <span class="cm">// shorthand: declares + assigns in one line</span>
+
+  <span class="fn">speak</span>()<span class="op">:</span> <span class="ty">string</span> {
+    <span class="kw">return</span> <span class="st">`</span><span class="op">${</span><span class="kw">this</span>.name<span class="op">}</span><span class="st"> says ...`</span>;
+  }
+}</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="concept">
+        <div class="concept-header">
+          <span class="concept-title">Inheritance</span>
+          <span class="diff-pill similar">similar</span>
+        </div>
+        <div class="panels">
+          <div class="panel panel-java">
+            <div class="panel-header"><span class="lang-dot dot-java"></span><span class="lang-name">Java</span></div>
+            <pre><span class="kw">public class</span> <span class="ty">Dog</span> <span class="kw">extends</span> <span class="ty">Animal</span> {
+  <span class="kw">public</span> <span class="fn">Dog</span>(<span class="ty">String</span> name) {
+    <span class="kw">super</span>(name);
+  }
+
+  <span class="op">@Override</span>
+  <span class="kw">public</span> <span class="ty">String</span> <span class="fn">speak</span>() {
+    <span class="kw">return super</span>.<span class="fn">speak</span>() + <span class="st">" woof"</span>;
+  }
+}</pre>
+          </div>
+          <div class="panel panel-cpp">
+            <div class="panel-header"><span class="lang-dot dot-cpp"></span><span class="lang-name">C++</span></div>
+            <pre><span class="kw">class</span> <span class="ty">Dog</span> <span class="op">:</span> <span class="kw">public</span> <span class="ty">Animal</span> {
+<span class="kw">public</span>:
+  <span class="fn">Dog</span>(std::string n) <span class="op">:</span> <span class="ty">Animal</span>(n) {}
+
+  std::string <span class="fn">speak</span>() <span class="kw">override</span> {
+    <span class="kw">return</span> <span class="ty">Animal</span><span class="op">::</span><span class="fn">speak</span>() + <span class="st">" woof"</span>;
+  }
+};</pre>
+          </div>
+          <div class="panel panel-js js-only">
+            <div class="panel-header"><span class="lang-dot dot-js"></span><span class="lang-name">JavaScript</span></div>
+            <pre><span class="kw">class</span> <span class="ty">Dog</span> <span class="kw">extends</span> <span class="ty">Animal</span> {
+  <span class="fn">constructor</span>(name) {
+    <span class="kw">super</span>(name); <span class="cm">// must call super first</span>
+  }
+
+  <span class="fn">speak</span>() {
+    <span class="kw">return super</span>.<span class="fn">speak</span>() + <span class="st">" woof"</span>;
+  }
+}</pre>
+          </div>
+          <div class="panel panel-ts ts-only">
+            <div class="panel-header"><span class="lang-dot dot-ts"></span><span class="lang-name">TypeScript</span></div>
+            <pre><span class="kw">class</span> <span class="ty">Dog</span> <span class="kw">extends</span> <span class="ty">Animal</span> {
+  <span class="kw">constructor</span>(name<span class="op">:</span> <span class="ty">string</span>) {
+    <span class="kw">super</span>(name);
+  }
+
+  <span class="fn">speak</span>()<span class="op">:</span> <span class="ty">string</span> {
+    <span class="kw">return super</span>.<span class="fn">speak</span>() + <span class="st">" woof"</span>;
+  }
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         INTERFACES
+    ════════════════════════════════ -->
+    <section class="section" id="s-interfaces">
+      <div class="section-header">
+        <div class="section-tag">Language Basics</div>
+        <div class="section-title">Interfaces / Contracts</div>
+        <div class="section-desc">TypeScript uses structural typing — if a value has the right shape, it satisfies the interface, regardless of whether it explicitly declares it. Java uses nominal typing.</div>
+      </div>
+
+      <div class="concept">
+        <div class="concept-header">
+          <span class="concept-title">Defining &amp; Implementing Interfaces</span>
+          <span class="diff-pill breaking">structural vs nominal</span>
+        </div>
+        <div class="panels">
+          <div class="panel panel-java">
+            <div class="panel-header"><span class="lang-dot dot-java"></span><span class="lang-name">Java</span></div>
+            <pre><span class="kw">interface</span> <span class="ty">Printable</span> {
+  <span class="ty">String</span> <span class="fn">render</span>();
+}
+
+<span class="cm">// must explicitly declare implements</span>
+<span class="kw">class</span> <span class="ty">Report</span> <span class="kw">implements</span> <span class="ty">Printable</span> {
+  <span class="kw">public</span> <span class="ty">String</span> <span class="fn">render</span>() {
+    <span class="kw">return</span> <span class="st">"report content"</span>;
+  }
+}</pre>
+          </div>
+          <div class="panel panel-cpp">
+            <div class="panel-header"><span class="lang-dot dot-cpp"></span><span class="lang-name">C++</span></div>
+            <pre><span class="cm">// C++ uses pure virtual for interfaces</span>
+<span class="kw">class</span> <span class="ty">Printable</span> {
+<span class="kw">public</span>:
+  <span class="kw">virtual</span> std::string <span class="fn">render</span>() = <span class="nm">0</span>;
+  <span class="kw">virtual</span> ~<span class="fn">Printable</span>() = <span class="kw">default</span>;
+};
+
+<span class="kw">class</span> <span class="ty">Report</span> <span class="op">:</span> <span class="kw">public</span> <span class="ty">Printable</span> {
+  std::string <span class="fn">render</span>() <span class="kw">override</span> {
+    <span class="kw">return</span> <span class="st">"report content"</span>;
+  }
+};</pre>
+          </div>
+          <div class="panel panel-js js-only">
+            <div class="panel-header"><span class="lang-dot dot-js"></span><span class="lang-name">JavaScript</span></div>
+            <pre><span class="cm">// no interfaces at runtime — duck typing</span>
+<span class="cm">// if it has render(), it's "Printable"</span>
+<span class="kw">const</span> report = {
+  <span class="fn">render</span>() { <span class="kw">return</span> <span class="st">"report content"</span>; }
+};
+
+<span class="cm">// JSDoc can annotate shape (optional)</span>
+<span class="cm">/** @param {{ render(): string }} printable */</span>
+<span class="kw">function</span> <span class="fn">print</span>(printable) {
+  console.<span class="fn">log</span>(printable.<span class="fn">render</span>());
+}</pre>
+          </div>
+          <div class="panel panel-ts ts-only">
+            <div class="panel-header"><span class="lang-dot dot-ts"></span><span class="lang-name">TypeScript</span></div>
+            <pre><span class="kw">interface</span> <span class="ty">Printable</span> {
+  <span class="fn">render</span>()<span class="op">:</span> <span class="ty">string</span>;
+}
+
+<span class="cm">// no implements needed — structural match is enough</span>
+<span class="kw">const</span> report = {
+  <span class="fn">render</span>()<span class="op">:</span> <span class="ty">string</span> { <span class="kw">return</span> <span class="st">"report content"</span>; }
+};
+
+<span class="kw">function</span> <span class="fn">print</span>(p<span class="op">:</span> <span class="ty">Printable</span>) {
+  console.<span class="fn">log</span>(p.<span class="fn">render</span>()); <span class="cm">// ✓ report satisfies it</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <strong>Structural typing</strong> means you can pass a plain object literal where an interface is expected, as long as the shape matches. No boilerplate class needed. TypeScript will tell you at compile time if the shape is wrong.
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         GENERICS
+    ════════════════════════════════ -->
+    <section class="section" id="s-generics">
+      <div class="section-header">
+        <div class="section-tag">Language Basics</div>
+        <div class="section-title">Generics / Templates</div>
+        <div class="section-desc">TypeScript generics look like Java generics syntactically. C++ templates are more powerful but more complex. TS generics are erased at compile time — no reification.</div>
+      </div>
+
+      <div class="concept">
+        <div class="concept-header">
+          <span class="concept-title">Generic Functions &amp; Types</span>
+          <span class="diff-pill similar">similar syntax (TS)</span>
+        </div>
+        <div class="panels">
+          <div class="panel panel-java">
+            <div class="panel-header"><span class="lang-dot dot-java"></span><span class="lang-name">Java</span></div>
+            <pre><span class="kw">public</span> &lt;<span class="ty">T</span>&gt; <span class="ty">T</span> <span class="fn">first</span>(<span class="ty">List</span>&lt;<span class="ty">T</span>&gt; items) {
+  <span class="kw">return</span> items.<span class="fn">get</span>(<span class="nm">0</span>);
+}
+
+<span class="kw">public</span> &lt;<span class="ty">T</span> <span class="kw">extends</span> <span class="ty">Comparable</span>&lt;<span class="ty">T</span>&gt;&gt; <span class="ty">T</span> <span class="fn">max</span>(<span class="ty">T</span> a, <span class="ty">T</span> b) {
+  <span class="kw">return</span> a.<span class="fn">compareTo</span>(b) &gt; <span class="nm">0</span> ? a : b;
+}</pre>
+          </div>
+          <div class="panel panel-cpp">
+            <div class="panel-header"><span class="lang-dot dot-cpp"></span><span class="lang-name">C++</span></div>
+            <pre><span class="kw">template</span>&lt;<span class="kw">typename</span> T&gt;
+T <span class="fn">first</span>(std::vector&lt;T&gt;<span class="op">&</span> items) {
+  <span class="kw">return</span> items[<span class="nm">0</span>];
+}
+
+<span class="kw">template</span>&lt;<span class="kw">typename</span> T&gt;
+T <span class="fn">max</span>(T a, T b) {
+  <span class="kw">return</span> a > b ? a : b;
+}</pre>
+          </div>
+          <div class="panel panel-js js-only">
+            <div class="panel-header"><span class="lang-dot dot-js"></span><span class="lang-name">JavaScript</span></div>
+            <pre><span class="cm">// no generics — just works on any value</span>
+<span class="kw">function</span> <span class="fn">first</span>(items) {
+  <span class="kw">return</span> items[<span class="nm">0</span>];
+}
+
+<span class="cm">// no constraint possible without runtime check</span>
+<span class="kw">function</span> <span class="fn">max</span>(a, b) {
+  <span class="kw">return</span> a > b ? a : b;
+}</pre>
+          </div>
+          <div class="panel panel-ts ts-only">
+            <div class="panel-header"><span class="lang-dot dot-ts"></span><span class="lang-name">TypeScript</span></div>
+            <pre><span class="kw">function</span> <span class="fn">first</span>&lt;<span class="ty">T</span>&gt;(items<span class="op">:</span> <span class="ty">T</span>[])<span class="op">:</span> <span class="ty">T</span> {
+  <span class="kw">return</span> items[<span class="nm">0</span>];
+}
+
+<span class="cm">// constrained generic</span>
+<span class="kw">function</span> <span class="fn">max</span>&lt;<span class="ty">T</span> <span class="kw">extends</span> { <span class="fn">valueOf</span>()<span class="op">:</span> <span class="ty">number</span> }&gt;(a<span class="op">:</span> <span class="ty">T</span>, b<span class="op">:</span> <span class="ty">T</span>)<span class="op">:</span> <span class="ty">T</span> {
+  <span class="kw">return</span> a.<span class="fn">valueOf</span>() > b.<span class="fn">valueOf</span>() ? a : b;
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         ERROR HANDLING
+    ════════════════════════════════ -->
+    <section class="section" id="s-errors">
+      <div class="section-header">
+        <div class="section-tag">Language Basics</div>
+        <div class="section-title">Error Handling</div>
+        <div class="section-desc">JS has no checked exceptions. You can throw anything — strings, objects, numbers. TypeScript doesn't type-check what's thrown.</div>
+      </div>
+
+      <div class="concept">
+        <div class="concept-header">
+          <span class="concept-title">try / catch / throw</span>
+          <span class="diff-pill gotcha">gotcha</span>
+          <span class="concept-note">catch(e) has no type in JS</span>
+        </div>
+        <div class="panels">
+          <div class="panel panel-java">
+            <div class="panel-header"><span class="lang-dot dot-java"></span><span class="lang-name">Java</span></div>
+            <pre><span class="kw">try</span> {
+  <span class="fn">riskyOp</span>();
+} <span class="kw">catch</span> (<span class="ty">IOException</span> e) {
+  <span class="cm">// typed catch — only catches IOException</span>
+  log(e.<span class="fn">getMessage</span>());
+} <span class="kw">finally</span> {
+  <span class="fn">cleanup</span>();
+}</pre>
+          </div>
+          <div class="panel panel-cpp">
+            <div class="panel-header"><span class="lang-dot dot-cpp"></span><span class="lang-name">C++</span></div>
+            <pre><span class="kw">try</span> {
+  <span class="fn">riskyOp</span>();
+} <span class="kw">catch</span> (<span class="kw">const</span> std::exception<span class="op">&</span> e) {
+  std::cerr &lt;&lt; e.<span class="fn">what</span>();
+} <span class="kw">catch</span> (...) {
+  <span class="cm">// catch anything</span>
+}</pre>
+          </div>
+          <div class="panel panel-js js-only">
+            <div class="panel-header"><span class="lang-dot dot-js"></span><span class="lang-name">JavaScript</span></div>
+            <pre><span class="kw">try</span> {
+  <span class="fn">riskyOp</span>();
+} <span class="kw">catch</span> (e) {
+  <span class="cm">// e is unknown type — could be anything</span>
+  <span class="kw">if</span> (e <span class="kw">instanceof</span> <span class="ty">Error</span>) {
+    console.<span class="fn">error</span>(e.message);
+  }
+} <span class="kw">finally</span> {
+  <span class="fn">cleanup</span>();
+}</pre>
+          </div>
+          <div class="panel panel-ts ts-only">
+            <div class="panel-header"><span class="lang-dot dot-ts"></span><span class="lang-name">TypeScript</span></div>
+            <pre><span class="kw">try</span> {
+  <span class="fn">riskyOp</span>();
+} <span class="kw">catch</span> (e) {
+  <span class="cm">// e is `unknown` in strict mode</span>
+  <span class="kw">if</span> (e <span class="kw">instanceof</span> <span class="ty">Error</span>) {
+    console.<span class="fn">error</span>(e.message); <span class="cm">// narrowed here</span>
+  }
+} <span class="kw">finally</span> {
+  <span class="fn">cleanup</span>();
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         ASYNC
+    ════════════════════════════════ -->
+    <section class="section" id="s-async">
+      <div class="section-header">
+        <div class="section-tag">Language Basics</div>
+        <div class="section-title">Async &amp; Concurrency</div>
+        <div class="section-desc">JS is single-threaded with an event loop. There are no real threads. Async is cooperative via Promises — not preemptive. async/await is syntactic sugar over Promises.</div>
+      </div>
+
+      <div class="concept">
+        <div class="concept-header">
+          <span class="concept-title">Async Operations</span>
+          <span class="diff-pill breaking">completely different model</span>
+        </div>
+        <div class="panels">
+          <div class="panel panel-java">
+            <div class="panel-header"><span class="lang-dot dot-java"></span><span class="lang-name">Java</span></div>
+            <pre><span class="cm">// CompletableFuture (Java 8+)</span>
+<span class="ty">CompletableFuture</span>&lt;<span class="ty">String</span>&gt; future =
+  <span class="ty">CompletableFuture</span>.<span class="fn">supplyAsync</span>(() <span class="op">-></span> <span class="fn">fetchData</span>());
+
+future
+  .<span class="fn">thenApply</span>(<span class="ty">String</span><span class="op">::</span>toUpperCase)
+  .<span class="fn">thenAccept</span>(<span class="ty">System</span>.out<span class="op">::</span>println);</pre>
+          </div>
+          <div class="panel panel-cpp">
+            <div class="panel-header"><span class="lang-dot dot-cpp"></span><span class="lang-name">C++</span></div>
+            <pre><span class="cm">// std::async + std::future</span>
+std::future&lt;std::string&gt; fut =
+  std::<span class="fn">async</span>(std::launch::async, <span class="fn">fetchData</span>);
+
+<span class="cm">// blocks calling thread</span>
+std::string result = fut.<span class="fn">get</span>();</pre>
+          </div>
+          <div class="panel panel-js js-only">
+            <div class="panel-header"><span class="lang-dot dot-js"></span><span class="lang-name">JavaScript</span></div>
+            <pre><span class="cm">// async/await — no threads, event loop</span>
+<span class="kw">async function</span> <span class="fn">loadData</span>() {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> result = <span class="kw">await</span> <span class="fn">fetchData</span>();
+    console.<span class="fn">log</span>(result.<span class="fn">toUpperCase</span>());
+  } <span class="kw">catch</span> (e) {
+    console.<span class="fn">error</span>(e);
+  }
+}
+
+<span class="cm">// parallel: Promise.all</span>
+<span class="kw">const</span> [a, b] = <span class="kw">await</span> <span class="ty">Promise</span>.<span class="fn">all</span>([<span class="fn">fa</span>(), <span class="fn">fb</span>()]);</pre>
+          </div>
+          <div class="panel panel-ts ts-only">
+            <div class="panel-header"><span class="lang-dot dot-ts"></span><span class="lang-name">TypeScript</span></div>
+            <pre><span class="cm">// Promise&lt;T&gt; is the typed return</span>
+<span class="kw">async function</span> <span class="fn">loadData</span>()<span class="op">:</span> <span class="ty">Promise</span>&lt;<span class="ty">void</span>&gt; {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> result<span class="op">:</span> <span class="ty">string</span> = <span class="kw">await</span> <span class="fn">fetchData</span>();
+    console.<span class="fn">log</span>(result.<span class="fn">toUpperCase</span>());
+  } <span class="kw">catch</span> (e) {
+    console.<span class="fn">error</span>(e);
+  }
+}
+
+<span class="kw">const</span> [a, b] = <span class="kw">await</span> <span class="ty">Promise</span>.<span class="fn">all</span>([<span class="fn">fa</span>(), <span class="fn">fb</span>()]);</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <strong>No threads.</strong> If you block the event loop (e.g. with a synchronous loop crunching numbers for 5 seconds), everything stops — UI, network, timers. CPU-bound work goes in a Worker thread. I/O is always async and non-blocking.
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         COLLECTIONS
+    ════════════════════════════════ -->
+    <section class="section" id="s-collections">
+      <div class="section-header">
+        <div class="section-tag">Language Basics</div>
+        <div class="section-title">Collections</div>
+        <div class="section-desc">Arrays and objects cover most cases. Map and Set are available as first-class types. No ArrayList vs LinkedList distinction — arrays are dynamic by default.</div>
+      </div>
+
+      <table class="equiv-table java-only">
+        <thead>
+          <tr>
+            <th>Java</th>
+            <th>C++</th>
+            <th>JS / TS</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>ArrayList&lt;T&gt;</td><td>vector&lt;T&gt;</td><td>T[]  / Array&lt;T&gt;</td><td>Dynamic, indexed</td></tr>
+          <tr><td>LinkedList&lt;T&gt;</td><td>list&lt;T&gt;</td><td>—</td><td>No direct equiv; use Array</td></tr>
+          <tr><td>HashMap&lt;K,V&gt;</td><td>unordered_map&lt;K,V&gt;</td><td>Map&lt;K,V&gt;</td><td>Any key type</td></tr>
+          <tr><td>{ } (object literal)</td><td>struct</td><td>Record&lt;string,V&gt;</td><td>String-keyed only</td></tr>
+          <tr><td>HashSet&lt;T&gt;</td><td>unordered_set&lt;T&gt;</td><td>Set&lt;T&gt;</td><td>Unique values</td></tr>
+          <tr><td>Stack&lt;T&gt;</td><td>stack&lt;T&gt;</td><td>Array (push/pop)</td><td>Arrays do double duty</td></tr>
+          <tr><td>Stream&lt;T&gt;</td><td>ranges (C++20)</td><td>.map/.filter/.reduce</td><td>Built into Array</td></tr>
+        </tbody>
+      </table>
+
+      <div class="concept">
+        <div class="concept-header">
+          <span class="concept-title">Common Array Operations</span>
+          <span class="diff-pill similar">similar to streams</span>
+        </div>
+        <div class="panels">
+          <div class="panel panel-java">
+            <div class="panel-header"><span class="lang-dot dot-java"></span><span class="lang-name">Java</span></div>
+            <pre><span class="ty">List</span>&lt;<span class="ty">Integer</span>&gt; nums = <span class="ty">List</span>.<span class="fn">of</span>(<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>,<span class="nm">4</span>,<span class="nm">5</span>);
+<span class="kw">int</span> sum = nums.<span class="fn">stream</span>()
+  .<span class="fn">filter</span>(n <span class="op">-></span> n % <span class="nm">2</span> == <span class="nm">0</span>)
+  .<span class="fn">mapToInt</span>(<span class="ty">Integer</span><span class="op">::</span>intValue)
+  .<span class="fn">sum</span>();</pre>
+          </div>
+          <div class="panel panel-cpp">
+            <div class="panel-header"><span class="lang-dot dot-cpp"></span><span class="lang-name">C++</span></div>
+            <pre>std::vector&lt;<span class="kw">int</span>&gt; nums = {<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>,<span class="nm">4</span>,<span class="nm">5</span>};
+<span class="kw">int</span> sum = <span class="nm">0</span>;
+<span class="kw">for</span> (<span class="kw">auto</span> n : nums)
+  <span class="kw">if</span> (n % <span class="nm">2</span> == <span class="nm">0</span>) sum += n;</pre>
+          </div>
+          <div class="panel panel-js js-only">
+            <div class="panel-header"><span class="lang-dot dot-js"></span><span class="lang-name">JavaScript</span></div>
+            <pre><span class="kw">const</span> nums = [<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>,<span class="nm">4</span>,<span class="nm">5</span>];
+<span class="kw">const</span> sum = nums
+  .<span class="fn">filter</span>(n <span class="op">=></span> n % <span class="nm">2</span> === <span class="nm">0</span>)
+  .<span class="fn">reduce</span>((acc, n) <span class="op">=></span> acc + n, <span class="nm">0</span>);</pre>
+          </div>
+          <div class="panel panel-ts ts-only">
+            <div class="panel-header"><span class="lang-dot dot-ts"></span><span class="lang-name">TypeScript</span></div>
+            <pre><span class="kw">const</span> nums<span class="op">:</span> <span class="ty">number</span>[] = [<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>,<span class="nm">4</span>,<span class="nm">5</span>];
+<span class="kw">const</span> sum<span class="op">:</span> <span class="ty">number</span> = nums
+  .<span class="fn">filter</span>(n <span class="op">=></span> n % <span class="nm">2</span> === <span class="nm">0</span>)
+  .<span class="fn">reduce</span>((acc, n) <span class="op">=></span> acc + n, <span class="nm">0</span>);</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         MODULES
+    ════════════════════════════════ -->
+    <section class="section" id="s-modules">
+      <div class="section-header">
+        <div class="section-tag">Language Basics</div>
+        <div class="section-title">Modules &amp; Packages</div>
+        <div class="section-desc">ES Modules are the standard. Each file is its own module. Exports are explicit — nothing is public by default.</div>
+      </div>
+
+      <div class="concept">
+        <div class="concept-header">
+          <span class="concept-title">Exporting &amp; Importing</span>
+          <span class="diff-pill breaking">different model</span>
+        </div>
+        <div class="panels">
+          <div class="panel panel-java">
+            <div class="panel-header"><span class="lang-dot dot-java"></span><span class="lang-name">Java</span></div>
+            <pre><span class="cm">// visibility via access modifiers</span>
+<span class="cm">// package com.example.utils;</span>
+<span class="kw">public class</span> <span class="ty">MathUtils</span> {
+  <span class="kw">public static int</span> <span class="fn">add</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) {
+    <span class="kw">return</span> a + b;
+  }
+}
+
+<span class="cm">// import com.example.utils.MathUtils;</span>
+<span class="kw">import</span> com.example.utils.MathUtils;</pre>
+          </div>
+          <div class="panel panel-cpp">
+            <div class="panel-header"><span class="lang-dot dot-cpp"></span><span class="lang-name">C++</span></div>
+            <pre><span class="cm">// mathutils.h</span>
+<span class="kw">#pragma once</span>
+<span class="kw">int</span> <span class="fn">add</span>(<span class="kw">int</span> a, <span class="kw">int</span> b);
+
+<span class="cm">// mathutils.cpp</span>
+<span class="kw">#include</span> <span class="st">"mathutils.h"</span>
+<span class="kw">int</span> <span class="fn">add</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) { <span class="kw">return</span> a + b; }
+
+<span class="cm">// consumer.cpp</span>
+<span class="kw">#include</span> <span class="st">"mathutils.h"</span></pre>
+          </div>
+          <div class="panel panel-js js-only">
+            <div class="panel-header"><span class="lang-dot dot-js"></span><span class="lang-name">JavaScript</span></div>
+            <pre><span class="cm">// mathUtils.js</span>
+<span class="kw">export function</span> <span class="fn">add</span>(a, b) { <span class="kw">return</span> a + b; }
+<span class="kw">export const</span> PI = <span class="nm">3.14159</span>;
+
+<span class="cm">// default export (one per file)</span>
+<span class="kw">export default class</span> <span class="ty">Calculator</span> { ... }
+
+<span class="cm">// consumer.js</span>
+<span class="kw">import</span> <span class="ty">Calculator</span>, { <span class="fn">add</span>, PI } <span class="kw">from</span> <span class="st">'./mathUtils.js'</span>;</pre>
+          </div>
+          <div class="panel panel-ts ts-only">
+            <div class="panel-header"><span class="lang-dot dot-ts"></span><span class="lang-name">TypeScript</span></div>
+            <pre><span class="cm">// mathUtils.ts — same syntax, plus types</span>
+<span class="kw">export function</span> <span class="fn">add</span>(a<span class="op">:</span> <span class="ty">number</span>, b<span class="op">:</span> <span class="ty">number</span>)<span class="op">:</span> <span class="ty">number</span> {
+  <span class="kw">return</span> a + b;
+}
+<span class="kw">export const</span> PI<span class="op">:</span> <span class="ty">number</span> = <span class="nm">3.14159</span>;
+<span class="kw">export type</span> { <span class="ty">MyType</span> }; <span class="cm">// type-only export</span>
+
+<span class="cm">// consumer.ts</span>
+<span class="kw">import</span> { <span class="fn">add</span>, PI } <span class="kw">from</span> <span class="st">'./mathUtils'</span>;</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         CONCEPTUAL DIFFERENCES
+    ════════════════════════════════ -->
+    <section class="section" id="s-conceptual">
+      <div class="section-header">
+        <div class="section-tag">Key Differences</div>
+        <div class="section-title">Conceptual Gaps</div>
+        <div class="section-desc">These aren't syntax differences. They're things that require a genuine mental model shift.</div>
+      </div>
+
+      <ul class="diff-list">
+        <li>
+          <span class="diff-key">Type system</span>
+          <span class="diff-val">Java and C++ use nominal typing — a class IS its type. TypeScript uses structural typing — a value is compatible with a type if its shape matches, regardless of where it came from. <em>Two unrelated classes with the same fields are interchangeable in TS.</em></span>
+        </li>
+        <li>
+          <span class="diff-key">Compilation target</span>
+          <span class="diff-val">TypeScript types are erased completely at compile time. At runtime, you're running plain JavaScript. You cannot inspect types at runtime — no <code>instanceof MyInterface</code> checks, no reflection on generics. <em>TS is a linter that disappears.</em></span>
+        </li>
+        <li>
+          <span class="diff-key">Concurrency model</span>
+          <span class="diff-val">JS is single-threaded with a cooperative event loop. There is no preemption. Async/await is cooperative yielding, not thread switching. Long synchronous operations block everything. <em>Think of it as Node being an event loop, not a thread pool.</em></span>
+        </li>
+        <li>
+          <span class="diff-key">Prototypes</span>
+          <span class="diff-val">Class syntax is sugar over prototype chains. Objects delegate to their prototype at runtime. This is why you can add methods to existing classes (monkey-patching), and why <code>this</code> context is dynamic. <em>Class in JS is not the same as class in Java.</em></span>
+        </li>
+        <li>
+          <span class="diff-key">Equality</span>
+          <span class="diff-val"><code>==</code> does type coercion (<code>"0" == 0</code> is <code>true</code>). Always use <code>===</code> for comparison. This trips up almost every Java/C++ dev. <em>Just never use ==.</em></span>
+        </li>
+        <li>
+          <span class="diff-key">Scope &amp; hoisting</span>
+          <span class="diff-val"><code>var</code> is function-scoped and hoisted. Always use <code>const</code> or <code>let</code> (block-scoped). <code>var</code> is legacy — avoid it entirely. <em>Pretend var doesn't exist.</em></span>
+        </li>
+        <li>
+          <span class="diff-key">this binding</span>
+          <span class="diff-val"><code>this</code> in JS is determined by how a function is called, not where it's defined. Arrow functions capture the outer <code>this</code> lexically. Regular functions get their own <code>this</code> from the call site. <em>This is the single biggest source of JS bugs for OOP devs.</em></span>
+        </li>
+        <li>
+          <span class="diff-key">No overloading</span>
+          <span class="diff-val">JS has no method overloading by signature. You get one function with a given name. TypeScript has <em>overload signatures</em> for type checking, but the runtime implementation is a single function that branches manually. <em>Use optional params or union types instead.</em></span>
+        </li>
+        <li>
+          <span class="diff-key">Memory management</span>
+          <span class="diff-val">Garbage collected, like Java. No manual memory management. No destructors called at predictable times. <em>Coming from C++, forget RAII — there's no deterministic cleanup.</em></span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ════════════════════════════════
+         GOTCHAS
+    ════════════════════════════════ -->
+    <section class="section" id="s-gotchas">
+      <div class="section-header">
+        <div class="section-tag">Key Differences</div>
+        <div class="section-title">Gotchas</div>
+        <div class="section-desc">Things that look familiar but aren't. Read these before you debug for two hours.</div>
+      </div>
+
+      <div class="concept">
+        <div class="concept-header">
+          <span class="concept-title">Equality trap</span>
+          <span class="diff-pill gotcha">gotcha</span>
+        </div>
+        <div class="panels">
+          <div class="panel panel-java">
+            <div class="panel-header"><span class="lang-dot dot-java"></span><span class="lang-name">Java</span></div>
+            <pre><span class="nm">1</span> == <span class="nm">1</span>          <span class="cm">// true</span>
+<span class="st">"a"</span>.<span class="fn">equals</span>(<span class="st">"a"</span>) <span class="cm">// true (value equality)</span>
+<span class="st">"a"</span> == <span class="st">"a"</span>      <span class="cm">// true (interned) — don't rely on it</span></pre>
+          </div>
+          <div class="panel panel-cpp">
+            <div class="panel-header"><span class="lang-dot dot-cpp"></span><span class="lang-name">C++</span></div>
+            <pre><span class="nm">1</span> == <span class="nm">1</span>           <span class="cm">// true</span>
+<span class="st">"a"</span>s == <span class="st">"a"</span>s    <span class="cm">// true (std::string value eq)</span>
+<span class="st">"a"</span> == <span class="st">"a"</span>      <span class="cm">// pointer comparison — unreliable</span></pre>
+          </div>
+          <div class="panel panel-js js-only">
+            <div class="panel-header"><span class="lang-dot dot-js"></span><span class="lang-name">JavaScript</span></div>
+            <pre><span class="st">"0"</span> == <span class="nm">0</span>    <span class="cm">// true  — coercion, DO NOT USE ==</span>
+<span class="st">"0"</span> === <span class="nm">0</span>   <span class="cm">// false — strict, use this always</span>
+<span class="kw">null</span> == <span class="kw">undefined</span>  <span class="cm">// true  (== only)</span>
+<span class="kw">null</span> === <span class="kw">undefined</span> <span class="cm">// false</span>
+[] == <span class="kw">false</span>  <span class="cm">// true  — do not ask why</span></pre>
+          </div>
+          <div class="panel panel-ts ts-only">
+            <div class="panel-header"><span class="lang-dot dot-ts"></span><span class="lang-name">TypeScript</span></div>
+            <pre><span class="cm">// TS won't always catch == on mismatched types</span>
+<span class="cm">// always use ===</span>
+<span class="st">"0"</span> <span class="op">===</span> <span class="nm">0</span>  <span class="cm">// false — TypeScript flags this as error</span>
+<span class="kw">null</span> <span class="op">===</span> <span class="kw">undefined</span> <span class="cm">// false</span>
+
+<span class="cm">// strict null checks catch most nullability issues</span>
+<span class="cm">// enable strictNullChecks in tsconfig</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="concept">
+        <div class="concept-header">
+          <span class="concept-title">Floating point (same as Java/C++)</span>
+          <span class="diff-pill similar">same issue, worse</span>
+        </div>
+        <div class="panels">
+          <div class="panel panel-java">
+            <div class="panel-header"><span class="lang-dot dot-java"></span><span class="lang-name">Java</span></div>
+            <pre><span class="nm">0.1</span> + <span class="nm">0.2</span> == <span class="nm">0.3</span> <span class="cm">// false — IEEE 754</span>
+<span class="cm">// use BigDecimal for money</span></pre>
+          </div>
+          <div class="panel panel-cpp">
+            <div class="panel-header"><span class="lang-dot dot-cpp"></span><span class="lang-name">C++</span></div>
+            <pre><span class="nm">0.1</span> + <span class="nm">0.2</span> == <span class="nm">0.3</span> <span class="cm">// false — IEEE 754</span>
+<span class="cm">// no BigDecimal — use a library</span></pre>
+          </div>
+          <div class="panel panel-js js-only">
+            <div class="panel-header"><span class="lang-dot dot-js"></span><span class="lang-name">JavaScript</span></div>
+            <pre><span class="nm">0.1</span> + <span class="nm">0.2</span> === <span class="nm">0.3</span>  <span class="cm">// false</span>
+<span class="nm">0.1</span> + <span class="nm">0.2</span>          <span class="cm">// 0.30000000000000004</span>
+
+<span class="cm">// ONE number type = no int type</span>
+<span class="cm">// integer overflow doesn't happen for most ranges</span>
+<span class="ty">Number</span>.MAX_SAFE_INTEGER <span class="cm">// 9007199254740991</span></pre>
+          </div>
+          <div class="panel panel-ts ts-only">
+            <div class="panel-header"><span class="lang-dot dot-ts"></span><span class="lang-name">TypeScript</span></div>
+            <pre><span class="nm">0.1</span> + <span class="nm">0.2</span> === <span class="nm">0.3</span>  <span class="cm">// false (same runtime)</span>
+
+<span class="cm">// use BigInt for large integers</span>
+<span class="kw">const</span> big<span class="op">:</span> <span class="ty">bigint</span> = <span class="nm">9007199254740992n</span>;
+
+<span class="cm">// for money: store as integer pence/cents</span>
+<span class="cm">// or use a decimal library</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout alert">
+        <strong>typeof null === "object"</strong> — This is a decades-old bug in JS that can never be fixed for backwards compatibility reasons. Always check <code>value === null</code> explicitly, not <code>typeof value === "object"</code>.
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         ECOSYSTEM
+    ════════════════════════════════ -->
+    <section class="section" id="s-ecosystem">
+      <div class="section-header">
+        <div class="section-tag">Ecosystem</div>
+        <div class="section-title">Tool Equivalents</div>
+        <div class="section-desc">Your muscle memory around tooling will need remapping. The JS ecosystem moves faster and fragments more.</div>
+      </div>
+
+      <div class="eco-grid">
+        <div class="eco-card">
+          <div class="eco-from">Java → Build / Package Manager</div>
+          <div class="eco-label">Maven / Gradle</div>
+          <div class="eco-to">
+            <span class="eco-chip">npm</span>
+            <span class="eco-chip">pnpm ★</span>
+            <span class="eco-chip">yarn</span>
+            <span class="eco-chip">bun</span>
+          </div>
+          <div class="eco-note">pnpm is recommended for monorepos. package.json = pom.xml. node_modules = local .m2. Lock files are mandatory — commit them.</div>
+        </div>
+
+        <div class="eco-card">
+          <div class="eco-from">C++ → Build System</div>
+          <div class="eco-label">CMake / Make / Bazel</div>
+          <div class="eco-to">
+            <span class="eco-chip">vite ★</span>
+            <span class="eco-chip">esbuild</span>
+            <span class="eco-chip">webpack</span>
+            <span class="eco-chip">rollup</span>
+            <span class="eco-chip">turbo</span>
+          </div>
+          <div class="eco-note">Vite for dev. Rollup/esbuild for library builds. Turborepo for monorepos. There is no single standard — pick based on context.</div>
+        </div>
+
+        <div class="eco-card">
+          <div class="eco-from">Java → Runtime</div>
+          <div class="eco-label">JVM</div>
+          <div class="eco-to">
+            <span class="eco-chip">Node.js ★</span>
+            <span class="eco-chip">Deno</span>
+            <span class="eco-chip">Bun</span>
+            <span class="eco-chip">Browser</span>
+          </div>
+          <div class="eco-note">Node is the default server runtime. Browser is its own environment with different APIs. Deno/Bun are alternatives with native TS support.</div>
+        </div>
+
+        <div class="eco-card">
+          <div class="eco-from">Java → Testing</div>
+          <div class="eco-label">JUnit / Mockito</div>
+          <div class="eco-to">
+            <span class="eco-chip">vitest ★</span>
+            <span class="eco-chip">jest</span>
+            <span class="eco-chip">playwright</span>
+            <span class="eco-chip">testing-library</span>
+          </div>
+          <div class="eco-note">Vitest for unit/integration (fast, Vite-native). Playwright for E2E browser tests. Testing Library for component tests.</div>
+        </div>
+
+        <div class="eco-card">
+          <div class="eco-from">Java → Type System / Linting</div>
+          <div class="eco-label">Compiler / Checkstyle / PMD</div>
+          <div class="eco-to">
+            <span class="eco-chip">TypeScript ★</span>
+            <span class="eco-chip">ESLint</span>
+            <span class="eco-chip">Prettier</span>
+            <span class="eco-chip">Biome</span>
+          </div>
+          <div class="eco-note">TypeScript for types. ESLint for rules. Prettier for formatting. Biome combines linting + formatting in one fast tool.</div>
+        </div>
+
+        <div class="eco-card">
+          <div class="eco-from">Java → HTTP Client / Server</div>
+          <div class="eco-label">Spring Boot / Servlet / OkHttp</div>
+          <div class="eco-to">
+            <span class="eco-chip">fetch ★</span>
+            <span class="eco-chip">axios</span>
+            <span class="eco-chip">express</span>
+            <span class="eco-chip">hono</span>
+            <span class="eco-chip">fastify</span>
+          </div>
+          <div class="eco-note">fetch is built-in everywhere now. Express for servers (legacy-ish). Hono/Fastify for modern, typed HTTP servers.</div>
+        </div>
+
+        <div class="eco-card">
+          <div class="eco-from">C++ → Package Registry</div>
+          <div class="eco-label">Conan / vcpkg</div>
+          <div class="eco-to">
+            <span class="eco-chip">npmjs.com ★</span>
+            <span class="eco-chip">jsr.io</span>
+          </div>
+          <div class="eco-note">npm registry has ~2.5M packages. Quality varies enormously. JSR is a newer typed registry. Vet your deps — the ecosystem has a left-pad problem history.</div>
+        </div>
+
+        <div class="eco-card">
+          <div class="eco-from">Java → Dependency Injection</div>
+          <div class="eco-label">Spring DI / Guice / CDI</div>
+          <div class="eco-to">
+            <span class="eco-chip">manual ★</span>
+            <span class="eco-chip">tsyringe</span>
+            <span class="eco-chip">inversify</span>
+            <span class="eco-chip">Context (React)</span>
+          </div>
+          <div class="eco-note">DI frameworks exist but are far less common. JS module imports are often sufficient. In frontend, React Context or Zustand replace service injection patterns.</div>
+        </div>
+
+        <div class="eco-card">
+          <div class="eco-from">Java → Logging</div>
+          <div class="eco-label">SLF4J / Logback / Log4j</div>
+          <div class="eco-to">
+            <span class="eco-chip">console ★</span>
+            <span class="eco-chip">pino</span>
+            <span class="eco-chip">winston</span>
+          </div>
+          <div class="eco-note">console.log is used far more casually than in Java. For production server logging, Pino is fast and structured (JSON output).</div>
+        </div>
+
+        <div class="eco-card">
+          <div class="eco-from">Java → TS Config</div>
+          <div class="eco-label">pom.xml / build.gradle</div>
+          <div class="eco-to">
+            <span class="eco-chip">tsconfig.json</span>
+            <span class="eco-chip">package.json</span>
+          </div>
+          <div class="eco-note">tsconfig.json controls compiler options. Enable strict: true. Set target, module, paths. Most frameworks give you a base config to extend.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         UI FRAMEWORKS
+    ════════════════════════════════ -->
+    <section class="section" id="s-frameworks">
+      <div class="section-header">
+        <div class="section-tag">Ecosystem</div>
+        <div class="section-title">UI Frameworks</div>
+        <div class="section-desc">If you're coming from a GUI or web UI background, here's how the major Java/C++ UI toolkits map to JS frameworks.</div>
+      </div>
+
+      <div class="eco-grid">
+        <div class="eco-card">
+          <div class="eco-from">Java Swing / JavaFX → Component UI</div>
+          <div class="eco-label">Swing / JavaFX</div>
+          <div class="eco-to">
+            <span class="eco-chip">React ★</span>
+            <span class="eco-chip">Vue</span>
+            <span class="eco-chip">Svelte</span>
+            <span class="eco-chip">Solid</span>
+          </div>
+          <div class="eco-note">React is the most widely adopted. Component model (reusable, composable UI elements) maps reasonably to Swing components. State management replaces MVC models.</div>
+        </div>
+
+        <div class="eco-card">
+          <div class="eco-from">C++ Qt → Desktop-class UI</div>
+          <div class="eco-label">Qt / wxWidgets / MFC</div>
+          <div class="eco-to">
+            <span class="eco-chip">Electron + React</span>
+            <span class="eco-chip">Tauri + Svelte</span>
+            <span class="eco-chip">React Native</span>
+          </div>
+          <div class="eco-note">Electron wraps a browser in a desktop shell (heavy). Tauri does the same with a native webview (lighter, Rust core). Qt's signal/slot maps roughly to event handlers + state.</div>
+        </div>
+
+        <div class="eco-card">
+          <div class="eco-from">Java Spring MVC → Full-stack Web</div>
+          <div class="eco-label">Spring MVC / Thymeleaf / JSF</div>
+          <div class="eco-to">
+            <span class="eco-chip">Next.js ★</span>
+            <span class="eco-chip">Nuxt</span>
+            <span class="eco-chip">SvelteKit</span>
+            <span class="eco-chip">Remix</span>
+          </div>
+          <div class="eco-note">Next.js (React) is the dominant full-stack framework. Server-side rendering, routing, API routes in one project. Replaces the Spring MVC + template engine pattern.</div>
+        </div>
+
+        <div class="eco-card">
+          <div class="eco-from">Java → State Management</div>
+          <div class="eco-label">MVC Model / Bean / Service</div>
+          <div class="eco-to">
+            <span class="eco-chip">useState/useReducer</span>
+            <span class="eco-chip">Zustand ★</span>
+            <span class="eco-chip">Jotai</span>
+            <span class="eco-chip">Redux</span>
+          </div>
+          <div class="eco-note">Start with React's built-in hooks. Add Zustand for shared state across components. Redux is the "enterprise" choice but has significant boilerplate overhead.</div>
+        </div>
+
+        <div class="eco-card">
+          <div class="eco-from">Java → Data Fetching</div>
+          <div class="eco-label">RestTemplate / Feign / WebClient</div>
+          <div class="eco-to">
+            <span class="eco-chip">TanStack Query ★</span>
+            <span class="eco-chip">SWR</span>
+            <span class="eco-chip">RTK Query</span>
+          </div>
+          <div class="eco-note">TanStack Query handles caching, loading states, error states, refetching — everything you'd wire manually. Replaces service layer patterns in frontend code.</div>
+        </div>
+
+        <div class="eco-card">
+          <div class="eco-from">C++ OpenGL/Vulkan → Canvas / GPU</div>
+          <div class="eco-label">OpenGL / Vulkan / DirectX</div>
+          <div class="eco-to">
+            <span class="eco-chip">WebGL</span>
+            <span class="eco-chip">WebGPU</span>
+            <span class="eco-chip">Three.js ★</span>
+            <span class="eco-chip">Babylon.js</span>
+          </div>
+          <div class="eco-note">WebGPU is the modern GPU API (compute + render). Three.js abstracts WebGL into a scene graph — closer to a game engine API than raw GL calls.</div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <strong>Framework comparison</strong> — React has the largest ecosystem and job market. Vue has a gentler learning curve and better docs. Svelte compiles away the framework (no virtual DOM, smallest bundle). Solid is the performance option. If you have no constraint, start with React.
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // ── Navigation ──
+  function goto(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('s-' + id).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  // ── Source language toggle ──
+  function setSource(lang) {
+    document.body.classList.remove('source-java', 'source-cpp', 'source-both');
+    document.body.classList.add('source-' + lang);
+
+    document.querySelectorAll('#source-group .pill').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+
+  // ── Target toggle ──
+  function setTarget(t) {
+    document.body.classList.remove('use-js', 'use-ts');
+    document.body.classList.add('use-' + t);
+
+    document.querySelectorAll('#target-group .pill').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+</script>
+</body>
+</html>
