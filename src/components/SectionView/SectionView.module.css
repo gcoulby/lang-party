@@ -1,0 +1,33 @@
+.section {
+  max-width: 1280px;
+}
+
+.header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.group {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.description {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  max-width: 600px;
+  line-height: 1.6;
+}

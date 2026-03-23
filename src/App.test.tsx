@@ -49,9 +49,10 @@ describe('App', () => {
 
   it('renders sidebar nav with section groups', () => {
     render(<App />)
-    expect(screen.getByText('Language Basics')).toBeInTheDocument()
-    expect(screen.getByText('Key Differences')).toBeInTheDocument()
-    expect(screen.getByText('Ecosystem')).toBeInTheDocument()
+    // These labels appear in both sidebar and section header — use getAllBy
+    expect(screen.getAllByText('Language Basics').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('Key Differences').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('Ecosystem').length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders all navigation sections', () => {

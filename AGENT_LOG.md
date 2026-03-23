@@ -146,3 +146,44 @@ Highlighter is solid for the target use cases. It intentionally does not handle 
 
 ### Next Milestone
 M3 — `content-basics`: populate all nine Language Basics sections with real, correct code examples.
+
+---
+
+## M3 — content-basics — 2026-03-23
+
+### Plan
+Populate all nine Language Basics sections and wire the content into the app.
+
+**Files to create:**
+- `src/content/variables.ts`, `functions.ts`, `classes.ts`, `interfaces.ts`, `generics.ts`, `errors.ts`, `async.ts`, `collections.ts`, `modules.ts`
+- `src/content/index.ts` — content registry, exports `SECTIONS: Section[]`
+
+**Files to modify:**
+- `src/components/Layout/Layout.tsx` — replace placeholder with `SectionView`
+- New `src/components/SectionView/SectionView.tsx` + `.module.css` — renders section header + concept cards
+
+**Acceptance criteria:**
+- All nine sections render with correct, syntactically-valid code examples
+- Source/target filter toggles correctly show/hide panels
+- `pnpm test` passes (no regressions)
+- `pnpm build` green
+
+### Implementation Notes
+- Content follows the schema exactly. All code examples are syntactically correct — no pseudocode.
+- `async.ts` exported as `async_` (can't use reserved word `async` as identifier).
+- Stub sections (conceptual, gotchas, ecosystem, frameworks) added with empty concept arrays — necessary for nav to work without 404.
+- `App.test.tsx` needed one fix: "Language Basics" now appears in both sidebar and SectionView header — changed `getByText` to `getAllByText`.
+- All callouts use the `warn`/`info`/`alert` variants as appropriate.
+
+### Test Results
+61 passed, 0 failed, 0 skipped.
+
+### Build Result
+✓ built in 442ms — 204 kB JS (64 kB gzip), 8 kB CSS. Size increase reflects actual content.
+
+### Evaluation
+Nine solid reference sections. Each has 3–5 concepts with real, runnable code. The opinionated callouts (e.g. "never use var", "never use == without ===") are in place. The filter system works correctly — switching Java/C++/Both and JS/TS updates the visible panels reactively. The stub sections for M4/M5 keep the nav functional without broken lookups.
+
+### Next Milestone
+M4 — `content-differences`: Conceptual Gaps and Gotchas — the highest-value pages.
+
