@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { EcoCard } from './EcoCard'
-import type { EcoMapping } from './EcoCard'
+import type { EcoMapping } from '../../types/content'
 
 const BASE_MAPPING: EcoMapping = {
   from: 'Maven',
