@@ -1,0 +1,70 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.panel:last-child {
+  border-right: none;
+}
+
+.header {
+  padding: 0.45rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot[data-lang='java'] { background: var(--java); }
+.dot[data-lang='cpp']  { background: var(--cpp); }
+.dot[data-lang='js']   { background: var(--js); }
+.dot[data-lang='ts']   { background: var(--ts); }
+
+.langName {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.pre {
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.85;
+  color: var(--text);
+  tab-size: 2;
+  white-space: pre;
+  word-break: normal;
+  overflow-wrap: normal;
+  margin: 0;
+  flex: 1;
+}
+
+.pre::-webkit-scrollbar { height: 4px; }
+.pre::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.pre::-webkit-scrollbar-track { background: transparent; }
+
+/* ── Syntax token colours ── */
+.token-keyword  { color: var(--token-keyword); }
+.token-type     { color: var(--token-type); }
+.token-string   { color: var(--token-string); }
+.token-comment  { color: var(--token-comment); font-style: italic; }
+.token-number   { color: var(--token-number); }
+.token-fn       { color: var(--token-fn); }
+.token-op       { color: var(--token-op); }
+.token-text     { color: inherit; }

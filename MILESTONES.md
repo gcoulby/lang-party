@@ -11,8 +11,8 @@ Tracked milestones for lang.party. The agent updates this file after each milest
 | # | Slug | Description | Status | Branch | Notes |
 |---|------|-------------|--------|--------|-------|
 | M1 | `scaffold` | Vite + React + TS project scaffold with routing shell, sidebar nav, header toggles, CSS token system, and empty section placeholder. Build and tests pass. | `complete` | `feat/scaffold` | 9 tests pass, build 147 kB JS / 4 kB CSS. tsconfig.app.json splits app/test type-checking. |
-| M2 | `content-schema` | Define content types, implement ConceptCard / Callout / EcoCard components with tests, and build hand-written syntax highlighter for Java, C++, JS, TS. | `in-progress` | `feat/content-schema` | Highlighter must be hand-written — no external tokeniser libraries. |
-| M3 | `content-basics` | Populate all nine Language Basics sections with accurate, complete code examples (Variables, Functions, Classes, Interfaces, Generics, Errors, Async, Collections, Modules). | `planned` | - | All code examples must be syntactically correct. No pseudocode. |
+| M2 | `content-schema` | Define content types, implement ConceptCard / Callout / EcoCard components with tests, and build hand-written syntax highlighter for Java, C++, JS, TS. | `complete` | `feat/content-schema` | 61 tests pass. Regex tokeniser, zero deps. EcoMapping type lives in EcoCard (not shared schema). |
+| M3 | `content-basics` | Populate all nine Language Basics sections with accurate, complete code examples (Variables, Functions, Classes, Interfaces, Generics, Errors, Async, Collections, Modules). | `in-progress` | `feat/content-basics` | All code examples must be syntactically correct. No pseudocode. |
 | M4 | `content-differences` | Populate Conceptual Gaps and Gotchas sections. Highest content-quality bar of all milestones. | `planned` | - | Blunt, opinionated tone. These are the pages engineers bookmark. |
 | M5 | `content-ecosystem` | Populate Tool Equivalents and UI Frameworks sections. Add equivalents table component. | `planned` | - | ★ markers indicate recommended-first picks. |
 | M6 | `search` | Keyboard-accessible search across section and concept titles, running in a Web Worker. No external search library. | `planned` | - | Worker posts results back to main thread. Debounced input. |
@@ -26,6 +26,7 @@ Tracked milestones for lang.party. The agent updates this file after each milest
 | # | Slug | Completed |
 |---|------|-----------|
 | M1 | `scaffold` | 2026-03-23 |
+| M2 | `content-schema` | 2026-03-23 |
 
 ---
 
