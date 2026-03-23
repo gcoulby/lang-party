@@ -1,7 +1,8 @@
+/// <reference types="node" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/lang-party/',
+  base: process.env.BASE_URL ? `/${process.env.BASE_URL}/` : '/lang-party/',
 })
