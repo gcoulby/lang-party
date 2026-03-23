@@ -51,6 +51,34 @@ Box<std::string> strBox{"hello"};
 auto s = strBox.get();`,
         },
         {
+          lang: 'python',
+          code: `from typing import TypeVar
+
+T = TypeVar("T")
+
+def first(items: list[T]) -> T:
+    return items[0]
+
+first([1, 2, 3])   # int
+first(["a", "b"])  # str
+
+# Python 3.12+ syntax:
+# def first[T](items: list[T]) -> T:
+#     return items[0]
+`,
+        },
+        {
+          lang: 'go',
+          code: `// Go generics (1.18+)
+func first[T any](items []T) T {
+    return items[0]
+}
+
+first([]int{1, 2, 3})   // 1 — int
+first([]string{"a"})    // "a" — string
+`,
+        },
+        {
           lang: 'js',
           code: `// JS: no generics — use JSDoc for IDE hints only
 /**
@@ -131,6 +159,40 @@ template<typename T,
 T square(T x) { return x * x; }`,
         },
         {
+          lang: 'python',
+          code: `from typing import TypeVar
+
+# Bound TypeVar — T must be int or float
+Numeric = TypeVar("Numeric", int, float)
+
+def add(a: Numeric, b: Numeric) -> Numeric:
+    return a + b
+
+add(1, 2)      # 3   — int
+add(1.5, 2.5)  # 4.0 — float
+# add("a", "b")  # type error
+`,
+        },
+        {
+          lang: 'go',
+          code: `import "golang.org/x/exp/constraints"
+
+// Constrain T to numeric types
+func add[T constraints.Number](a, b T) T {
+    return a + b
+}
+
+add(1, 2)          // 3
+add(1.5, 2.5)      // 4.0
+
+// Custom constraint interface
+type Stringer interface {
+    String() string
+}
+func print[T Stringer](v T) { fmt.Println(v.String()) }
+`,
+        },
+        {
           lang: 'js',
           code: `// No constraints — runtime checks only
 function max(a, b) {
@@ -164,6 +226,47 @@ getProperty(user, 'age');  // number
       tag: 'breaking',
       note: 'TS only',
       panels: [
+        {
+          lang: 'python',
+          code: `from typing import Optional, Union, Callable
+
+# Optional[X] is shorthand for Union[X, None]
+def find(items: list[str], key: str) -> Optional[str]:
+    return next((i for i in items if i == key), None)
+
+# Union — accept multiple types
+def parse(raw: Union[str, int]) -> str:
+    return str(raw)
+
+# Callable[[arg_types], return_type]
+def apply(fn: Callable[[int], int], x: int) -> int:
+    return fn(x)
+`,
+        },
+        {
+          lang: 'go',
+          code: `// Go standard library generics
+// maps.Keys, slices.Contains, etc. (Go 1.21+)
+import "slices"
+
+// Optional via pointer (nil = absent)
+func find(items []string, key string) *string {
+    for _, v := range items {
+        if v == key { return &v }
+    }
+    return nil
+}
+
+// Functional helpers using generics
+func Map[T, U any](items []T, f func(T) U) []U {
+    result := make([]U, len(items))
+    for i, v := range items {
+        result[i] = f(v)
+    }
+    return result
+}
+`,
+        },
         {
           lang: 'ts',
           code: `interface User {

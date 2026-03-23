@@ -1,28 +1,28 @@
 import { useState } from 'react'
-import type { SourceLang, TargetLang } from '../types/content'
+import type { Lang } from '../types/content'
 
-export type SourceFilter = SourceLang | 'both'
+export type { Lang }
 
 export interface AppState {
-  sourceFilter: SourceFilter
-  targetLang: TargetLang
+  fromLang: Lang
+  toLang: Lang
   activeSectionId: string
-  setSourceFilter: (v: SourceFilter) => void
-  setTargetLang: (v: TargetLang) => void
+  setFromLang: (v: Lang) => void
+  setToLang: (v: Lang) => void
   setActiveSectionId: (id: string) => void
 }
 
 export function useAppState(): AppState {
-  const [sourceFilter, setSourceFilter] = useState<SourceFilter>('both')
-  const [targetLang, setTargetLang] = useState<TargetLang>('ts')
+  const [fromLang, setFromLang] = useState<Lang>('java')
+  const [toLang, setToLang] = useState<Lang>('ts')
   const [activeSectionId, setActiveSectionId] = useState<string>('variables')
 
   return {
-    sourceFilter,
-    targetLang,
+    fromLang,
+    toLang,
     activeSectionId,
-    setSourceFilter,
-    setTargetLang,
+    setFromLang,
+    setToLang,
     setActiveSectionId,
   }
 }

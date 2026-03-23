@@ -10,46 +10,49 @@ describe('App', () => {
     expect(header).toHaveTextContent('party')
   })
 
-  it('renders source language toggle buttons', () => {
+  it('renders from-language and to-language selects', () => {
     render(<App />)
-    expect(screen.getByRole('button', { name: /java/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /c\+\+/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /both/i })).toBeInTheDocument()
+    expect(screen.getByLabelText(/source language/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/target language/i)).toBeInTheDocument()
   })
 
-  it('renders target language toggle buttons', () => {
+  it('defaults to Java as source and TypeScript as target', () => {
     render(<App />)
-    expect(screen.getByRole('button', { name: /^js$/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^ts$/i })).toBeInTheDocument()
+    const fromSelect = screen.getByLabelText(/source language/i) as HTMLSelectElement
+    const toSelect = screen.getByLabelText(/target language/i) as HTMLSelectElement
+    expect(fromSelect.value).toBe('java')
+    expect(toSelect.value).toBe('ts')
   })
 
-  it('defaults to Both source and TS target', () => {
-    render(<App />)
-    expect(screen.getByRole('button', { name: /both/i })).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByRole('button', { name: /^ts$/i })).toHaveAttribute('aria-pressed', 'true')
-  })
-
-  it('switches source language when pill is clicked', async () => {
+  it('changes source language when from-select changes', async () => {
     const user = userEvent.setup()
     render(<App />)
-    const javaBtn = screen.getByRole('button', { name: /java/i })
-    await user.click(javaBtn)
-    expect(javaBtn).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByRole('button', { name: /both/i })).toHaveAttribute('aria-pressed', 'false')
+    const fromSelect = screen.getByLabelText(/source language/i)
+    await user.selectOptions(fromSelect, 'python')
+    expect((fromSelect as HTMLSelectElement).value).toBe('python')
   })
 
-  it('switches target language when pill is clicked', async () => {
+  it('changes target language when to-select changes', async () => {
     const user = userEvent.setup()
     render(<App />)
-    const jsBtn = screen.getByRole('button', { name: /^js$/i })
-    await user.click(jsBtn)
-    expect(jsBtn).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByRole('button', { name: /^ts$/i })).toHaveAttribute('aria-pressed', 'false')
+    const toSelect = screen.getByLabelText(/target language/i)
+    await user.selectOptions(toSelect, 'js')
+    expect((toSelect as HTMLSelectElement).value).toBe('js')
+  })
+
+  it('swaps when from-select is set to the current to-language', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    // Default: from=java, to=ts. Select 'ts' as from — to should swap to 'java'
+    const fromSelect = screen.getByLabelText(/source language/i) as HTMLSelectElement
+    const toSelect = screen.getByLabelText(/target language/i) as HTMLSelectElement
+    await user.selectOptions(fromSelect, 'ts')
+    expect(fromSelect.value).toBe('ts')
+    expect(toSelect.value).toBe('java')
   })
 
   it('renders sidebar nav with section groups', () => {
     render(<App />)
-    // These labels appear in both sidebar and section header — use getAllBy
     expect(screen.getAllByText('Language Basics').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText('Key Differences').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText('Ecosystem').length).toBeGreaterThanOrEqual(1)

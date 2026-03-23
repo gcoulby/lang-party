@@ -1,10 +1,9 @@
-export type SourceLang = 'java' | 'cpp'
-export type TargetLang = 'js' | 'ts'
+export type Lang = 'java' | 'cpp' | 'python' | 'go' | 'js' | 'ts'
 export type DiffTag = 'breaking' | 'similar' | 'gotcha'
 export type CalloutVariant = 'warn' | 'info' | 'alert'
 
 export interface CodePanel {
-  lang: SourceLang | TargetLang
+  lang: Lang
   code: string
 }
 
@@ -20,13 +19,13 @@ export interface ConceptEntry {
   }
 }
 
-/** A tool/concept mapping from source language to JS/TS equivalent. */
+/** A tool/concept mapping from one language to another ecosystem's equivalent. */
 export interface EcoMapping {
   /** Tool or concept name in the source language (e.g. "Maven") */
   from: string
   /** Source language label (e.g. "Java") */
   fromLabel: string
-  /** JS/TS equivalents. Prefix with ★ to mark as recommended. */
+  /** Target language equivalents. Prefix with ★ to mark as recommended. */
   to: string[]
   note?: string
 }

@@ -1,14 +1,12 @@
-import type { ConceptEntry } from '../../types/content'
-import type { SourceFilter } from '../../hooks/useAppState'
-import type { TargetLang } from '../../types/content'
+import type { ConceptEntry, Lang } from '../../types/content'
 import { CodePanel } from '../CodePanel/CodePanel'
 import { Callout } from '../Callout/Callout'
 import styles from './ConceptCard.module.css'
 
 interface Props {
   concept: ConceptEntry
-  sourceFilter: SourceFilter
-  targetLang: TargetLang
+  fromLang: Lang
+  toLang: Lang
 }
 
 const TAG_LABELS: Record<string, string> = {
@@ -17,14 +15,10 @@ const TAG_LABELS: Record<string, string> = {
   gotcha: 'gotcha',
 }
 
-export function ConceptCard({ concept, sourceFilter, targetLang }: Props) {
-  const visiblePanels = concept.panels.filter((p) => {
-    if (p.lang === 'java' && sourceFilter === 'cpp') return false
-    if (p.lang === 'cpp' && sourceFilter === 'java') return false
-    if (p.lang === 'js' && targetLang === 'ts') return false
-    if (p.lang === 'ts' && targetLang === 'js') return false
-    return true
-  })
+export function ConceptCard({ concept, fromLang, toLang }: Props) {
+  const visiblePanels = concept.panels.filter(
+    (p) => p.lang === fromLang || p.lang === toLang,
+  )
 
   return (
     <article className={styles.card}>

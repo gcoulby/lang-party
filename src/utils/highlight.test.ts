@@ -177,3 +177,55 @@ describe('highlight — mixed code', () => {
     expect(highlight('', 'ts')).toHaveLength(0)
   })
 })
+
+describe('highlight — Python', () => {
+  it('tokenises Python keywords', () => {
+    const t = highlight('def greet(name):', 'python')
+    expect(t.find((tok) => tok.value === 'def')?.type).toBe('keyword')
+  })
+
+  it('tokenises Python hash comments', () => {
+    const tokens = highlight('# this is a comment', 'python')
+    expect(tokens[0]).toEqual({ type: 'comment', value: '# this is a comment' })
+  })
+
+  it('tokenises Python None/True/False as keywords', () => {
+    const t = highlight('x = None', 'python')
+    expect(t.find((tok) => tok.value === 'None')?.type).toBe('keyword')
+  })
+
+  it('tokenises Python triple-quoted strings', () => {
+    const tokens = highlight('"""hello world"""', 'python')
+    expect(tokens).toHaveLength(1)
+    expect(tokens[0]).toEqual({ type: 'string', value: '"""hello world"""' })
+  })
+
+  it('tokenises Python f-string prefix as text and body as string', () => {
+    const t = highlight('f"hello"', 'python')
+    expect(t.find((tok) => tok.value === 'f')?.type).toBe('text')
+    expect(t.find((tok) => tok.type === 'string')?.value).toBe('"hello"')
+  })
+})
+
+describe('highlight — Go', () => {
+  it('tokenises Go keywords', () => {
+    const t = highlight('func main() {', 'go')
+    expect(t.find((tok) => tok.value === 'func')?.type).toBe('keyword')
+  })
+
+  it('tokenises Go short variable declaration operator', () => {
+    const t = highlight('x := 42', 'go')
+    expect(t.find((tok) => tok.value === ':=')?.type).toBe('op')
+  })
+
+  it('tokenises Go nil as keyword', () => {
+    const t = highlight('var err error = nil', 'go')
+    expect(t.find((tok) => tok.value === 'nil')?.type).toBe('keyword')
+  })
+
+  it('tokenises Go backtick raw strings', () => {
+    const tokens = highlight('`raw string`', 'go')
+    expect(tokens).toHaveLength(1)
+    expect(tokens[0].type).toBe('string')
+  })
+})

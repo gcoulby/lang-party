@@ -1,4 +1,4 @@
-import type { SourceLang, TargetLang } from '../types/content'
+import type { Lang } from '../types/content'
 
 export type TokenType =
   | 'keyword'
@@ -62,22 +62,53 @@ const TS_KEYWORDS = new Set([
   'readonly', 'satisfies', 'string', 'symbol', 'type', 'unique', 'unknown',
 ])
 
+const PYTHON_KEYWORDS = new Set([
+  'False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await',
+  'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except',
+  'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is',
+  'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try',
+  'while', 'with', 'yield',
+  // common builtins treated as keywords for highlighting
+  'int', 'float', 'str', 'bool', 'list', 'dict', 'set', 'tuple',
+  'type', 'object', 'super', 'self', 'cls',
+  'print', 'len', 'range', 'enumerate', 'zip', 'map', 'filter',
+  'isinstance', 'issubclass', 'hasattr', 'getattr', 'setattr',
+  'staticmethod', 'classmethod', 'property', 'abstractmethod',
+])
+
+const GO_KEYWORDS = new Set([
+  'break', 'case', 'chan', 'const', 'continue', 'default', 'defer',
+  'else', 'fallthrough', 'for', 'func', 'go', 'goto', 'if', 'import',
+  'interface', 'map', 'package', 'range', 'return', 'select', 'struct',
+  'switch', 'type', 'var',
+  // predeclared types
+  'bool', 'byte', 'complex64', 'complex128', 'error', 'float32', 'float64',
+  'int', 'int8', 'int16', 'int32', 'int64', 'rune', 'string', 'uint',
+  'uint8', 'uint16', 'uint32', 'uint64', 'uintptr',
+  // predeclared values / functions
+  'true', 'false', 'nil', 'iota',
+  'append', 'cap', 'close', 'copy', 'delete', 'len', 'make', 'new',
+  'panic', 'recover',
+])
+
 // Types that are PascalCase look like types in all languages.
 // These are additional lowercase TS primitives not in keyword set already:
 const TS_TYPE_KEYWORDS = new Set(['string', 'number', 'boolean', 'void', 'never', 'any', 'unknown', 'object', 'bigint', 'symbol'])
 
-function getKeywords(lang: SourceLang | TargetLang): Set<string> {
+function getKeywords(lang: Lang): Set<string> {
   switch (lang) {
-    case 'java': return JAVA_KEYWORDS
-    case 'cpp':  return CPP_KEYWORDS
-    case 'js':   return JS_KEYWORDS
-    case 'ts':   return TS_KEYWORDS
+    case 'java':   return JAVA_KEYWORDS
+    case 'cpp':    return CPP_KEYWORDS
+    case 'python': return PYTHON_KEYWORDS
+    case 'go':     return GO_KEYWORDS
+    case 'js':     return JS_KEYWORDS
+    case 'ts':     return TS_KEYWORDS
   }
 }
 
 // ── Tokeniser ─────────────────────────────────────────────────────────────
 
-export function highlight(code: string, lang: SourceLang | TargetLang): Token[] {
+export function highlight(code: string, lang: Lang): Token[] {
   const tokens: Token[] = []
   const keywords = getKeywords(lang)
   let i = 0
@@ -102,7 +133,7 @@ export function highlight(code: string, lang: SourceLang | TargetLang): Token[] 
       continue
     }
 
-    // Hash comment (Python-style, used in some C++ preprocessor contexts)
+    // Hash comment (Python, shell — also catches C preprocessor directives)
     if (code[i] === '#') {
       const end = code.indexOf('\n', i)
       const value = end === -1 ? code.slice(i) : code.slice(i, end)
@@ -121,6 +152,19 @@ export function highlight(code: string, lang: SourceLang | TargetLang): Token[] 
       }
       tokens.push({ type: 'string', value: code.slice(i, j) })
       i = j
+      continue
+    }
+
+    // Triple-quoted string (Python docstrings: """...""" or '''...''')
+    if (
+      (code[i] === '"' && code[i + 1] === '"' && code[i + 2] === '"') ||
+      (code[i] === "'" && code[i + 1] === "'" && code[i + 2] === "'")
+    ) {
+      const delim = code.slice(i, i + 3)
+      const end = code.indexOf(delim, i + 3)
+      const value = end === -1 ? code.slice(i) : code.slice(i, end + 3)
+      tokens.push({ type: 'string', value })
+      i += value.length
       continue
     }
 
@@ -215,7 +259,7 @@ export function highlight(code: string, lang: SourceLang | TargetLang): Token[] 
 
     // Operators: multi-char first, then single-char
     const opMatch = code.slice(i).match(
-      /^(===|!==|=>|->|::|<<|>>|<=|>=|==|!=|\|\||&&|\+\+|--|[+\-*/%&|^~<>=!?:;,.])/
+      /^(===|!==|:=|=>|->|::|<<|>>|<=|>=|==|!=|\|\||&&|\+\+|--|[+\-*/%&|^~<>=!?:;,.])/
     )
     if (opMatch) {
       tokens.push({ type: 'op', value: opMatch[0] })
