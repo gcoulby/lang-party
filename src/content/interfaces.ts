@@ -47,6 +47,48 @@ public:
 };`,
         },
         {
+          lang: 'python',
+          code: `from typing import Protocol
+
+# Protocol = structural typing (no explicit "implements")
+class Drawable(Protocol):
+    def draw(self) -> None: ...
+    def area(self) -> float: ...
+
+class Circle:
+    def __init__(self, radius: float) -> None:
+        self.radius = radius
+    def draw(self) -> None:
+        print(f"circle r={self.radius}")
+    def area(self) -> float:
+        import math
+        return math.pi * self.radius ** 2
+
+def render(shape: Drawable) -> None:
+    shape.draw()
+
+render(Circle(5))  # works — Circle satisfies Drawable
+`,
+        },
+        {
+          lang: 'go',
+          code: `// Go interfaces are implicit — no "implements" keyword
+type Drawable interface {
+    Draw()
+    Area() float64
+}
+
+type Circle struct{ Radius float64 }
+
+func (c Circle) Draw()         { fmt.Printf("circle r=%.1f\\n", c.Radius) }
+func (c Circle) Area() float64 { return math.Pi * c.Radius * c.Radius }
+
+func render(d Drawable) { d.Draw() }
+
+render(Circle{Radius: 5})  // Circle satisfies Drawable automatically
+`,
+        },
+        {
           lang: 'js',
           code: `// JS: no interface keyword — duck typing only
 // A value "implements" a contract if it has the right shape
@@ -146,6 +188,45 @@ private:
 };`,
         },
         {
+          lang: 'python',
+          code: `from typing import Protocol
+from abc import ABC, abstractmethod
+
+class Printable(Protocol):
+    def print(self) -> None: ...
+
+class Loggable(Protocol):
+    def log(self, msg: str) -> None: ...
+
+# Combine protocols
+class PrintLoggable(Printable, Loggable, Protocol): ...
+
+# Abstract base classes for enforcement at instantiation
+class Shape(ABC):
+    @abstractmethod
+    def area(self) -> float: ...
+
+# class Bad(Shape): pass  # TypeError: can't instantiate
+`,
+        },
+        {
+          lang: 'go',
+          code: `type Reader interface { Read(p []byte) (n int, err error) }
+type Writer interface { Write(p []byte) (n int, err error) }
+
+// Interface composition — embed other interfaces
+type ReadWriter interface {
+    Reader
+    Writer
+}
+
+// Any type implementing both Read and Write satisfies ReadWriter
+type Buffer struct{ data []byte }
+func (b *Buffer) Read(p []byte) (int, error)  { /* ... */; return 0, nil }
+func (b *Buffer) Write(p []byte) (int, error) { /* ... */; return len(p), nil }
+`,
+        },
+        {
           lang: 'js',
           code: `// JS: no interfaces — mix behaviour with mixins or composition
 const ShapeMixin = (Base) => class extends Base {
@@ -196,6 +277,51 @@ class Circle implements Shape, Colored {
       tag: 'similar',
       note: 'TS only',
       panels: [
+        {
+          lang: 'python',
+          code: `from typing import TypedDict, Protocol
+from dataclasses import dataclass
+
+# TypedDict: shape of a dict (like TS interface for data)
+class User(TypedDict):
+    id: int
+    name: str
+    email: str
+
+# Protocol: structural behaviour contract
+class Hashable(Protocol):
+    def __hash__(self) -> int: ...
+
+# dataclass: auto-generates __init__, __repr__, __eq__
+@dataclass
+class Point:
+    x: float
+    y: float
+`,
+        },
+        {
+          lang: 'go',
+          code: `// struct: data shape
+type User struct {
+    ID    int
+    Name  string
+    Email string
+}
+
+// interface: behaviour contract
+type Stringer interface {
+    String() string
+}
+
+// type alias
+type UserID = int
+
+// type definition (new distinct type)
+type Celsius float64
+type Fahrenheit float64
+// Can't accidentally mix Celsius and Fahrenheit — distinct types
+`,
+        },
         {
           lang: 'ts',
           code: `// interface: open (can be re-opened / merged)

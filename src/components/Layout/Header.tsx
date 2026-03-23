@@ -1,38 +1,47 @@
-import type { AppState, SourceFilter } from '../../hooks/useAppState'
-import type { TargetLang } from '../../types/content'
+import type { AppState, Lang } from '../../hooks/useAppState'
 import { SearchBar } from '../SearchBar/SearchBar'
 import styles from './Header.module.css'
 
 interface Props {
-  sourceFilter: AppState['sourceFilter']
-  targetLang: AppState['targetLang']
-  onSourceChange: (v: SourceFilter) => void
-  onTargetChange: (v: TargetLang) => void
+  fromLang: AppState['fromLang']
+  toLang: AppState['toLang']
+  onFromChange: (v: Lang) => void
+  onToChange: (v: Lang) => void
   onSectionChange: (id: string) => void
   menuOpen: boolean
   onMenuToggle: () => void
 }
 
-const SOURCE_PILLS: { value: SourceFilter; label: string }[] = [
-  { value: 'java', label: 'Java' },
-  { value: 'cpp', label: 'C++' },
-  { value: 'both', label: 'Both' },
-]
-
-const TARGET_PILLS: { value: TargetLang; label: string }[] = [
-  { value: 'js', label: 'JS' },
-  { value: 'ts', label: 'TS' },
+const LANG_OPTIONS: { value: Lang; label: string }[] = [
+  { value: 'java',   label: 'Java' },
+  { value: 'cpp',    label: 'C++' },
+  { value: 'python', label: 'Python' },
+  { value: 'go',     label: 'Go' },
+  { value: 'js',     label: 'JavaScript' },
+  { value: 'ts',     label: 'TypeScript' },
 ]
 
 export function Header({
-  sourceFilter,
-  targetLang,
-  onSourceChange,
-  onTargetChange,
+  fromLang,
+  toLang,
+  onFromChange,
+  onToChange,
   onSectionChange,
   menuOpen,
   onMenuToggle,
 }: Props) {
+  function handleFromChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const val = e.target.value as Lang
+    if (val === toLang) onToChange(fromLang)
+    onFromChange(val)
+  }
+
+  function handleToChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const val = e.target.value as Lang
+    if (val === fromLang) onFromChange(toLang)
+    onToChange(val)
+  }
+
   return (
     <header className={styles.header}>
       <button
@@ -54,37 +63,35 @@ export function Header({
       <SearchBar onSelect={onSectionChange} />
 
       <div className={styles.controls}>
-        <span className={styles.label}>from</span>
-        <div className={styles.pillGroup} role="group" aria-label="Source language">
-          {SOURCE_PILLS.map(({ value, label }) => (
-            <button
-              key={value}
-              className={styles.pill}
-              data-active={sourceFilter === value ? 'true' : 'false'}
-              data-lang={value}
-              onClick={() => onSourceChange(value)}
-              aria-pressed={sourceFilter === value}
-            >
-              {label}
-            </button>
+        <label className={styles.label} htmlFor="from-lang">from</label>
+        <select
+          id="from-lang"
+          className={styles.select}
+          value={fromLang}
+          onChange={handleFromChange}
+          data-lang={fromLang}
+          aria-label="Source language"
+        >
+          {LANG_OPTIONS.map(({ value, label }) => (
+            <option key={value} value={value}>{label}</option>
           ))}
-        </div>
+        </select>
 
-        <span className={styles.label}>to</span>
-        <div className={styles.pillGroup} role="group" aria-label="Target language">
-          {TARGET_PILLS.map(({ value, label }) => (
-            <button
-              key={value}
-              className={styles.pill}
-              data-active={targetLang === value ? 'true' : 'false'}
-              data-lang={value}
-              onClick={() => onTargetChange(value)}
-              aria-pressed={targetLang === value}
-            >
-              {label}
-            </button>
+        <span className={styles.arrow} aria-hidden="true">→</span>
+
+        <label className={styles.label} htmlFor="to-lang">to</label>
+        <select
+          id="to-lang"
+          className={styles.select}
+          value={toLang}
+          onChange={handleToChange}
+          data-lang={toLang}
+          aria-label="Target language"
+        >
+          {LANG_OPTIONS.map(({ value, label }) => (
+            <option key={value} value={value}>{label}</option>
           ))}
-        </div>
+        </select>
       </div>
     </header>
   )

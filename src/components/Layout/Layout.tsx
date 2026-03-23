@@ -29,10 +29,10 @@ export function Layout({ state }: Props) {
       </a>
 
       <Header
-        sourceFilter={state.sourceFilter}
-        targetLang={state.targetLang}
-        onSourceChange={state.setSourceFilter}
-        onTargetChange={state.setTargetLang}
+        fromLang={state.fromLang}
+        toLang={state.toLang}
+        onFromChange={state.setFromLang}
+        onToChange={state.setToLang}
         onSectionChange={handleSectionChange}
         menuOpen={menuOpen}
         onMenuToggle={() => setMenuOpen((o) => !o)}
@@ -54,8 +54,8 @@ export function Layout({ state }: Props) {
         <main id="main-content" className={styles.main} tabIndex={-1}>
           <SectionView
             section={section}
-            sourceFilter={state.sourceFilter}
-            targetLang={state.targetLang}
+            fromLang={state.fromLang}
+            toLang={state.toLang}
           />
         </main>
       </div>

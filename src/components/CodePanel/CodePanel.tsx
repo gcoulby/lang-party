@@ -3,10 +3,12 @@ import type { CodePanel as CodePanelData } from '../../types/content'
 import styles from './CodePanel.module.css'
 
 const LANG_LABELS: Record<string, string> = {
-  java: 'Java',
-  cpp: 'C++',
-  js: 'JavaScript',
-  ts: 'TypeScript',
+  java:   'Java',
+  cpp:    'C++',
+  python: 'Python',
+  go:     'Go',
+  js:     'JavaScript',
+  ts:     'TypeScript',
 }
 
 interface Props {

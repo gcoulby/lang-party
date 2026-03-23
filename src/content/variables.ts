@@ -35,6 +35,28 @@ auto items = std::vector<std::string>{};
 auto total = 42;`,
         },
         {
+          lang: 'python',
+          code: `x: int = 42
+name: str = "Alice"
+active: bool = True
+
+# Type annotation is optional — Python infers
+count = 0
+`,
+        },
+        {
+          lang: 'go',
+          code: `// Short declaration (type inferred)
+x := 42
+name := "Alice"
+active := true
+
+// Explicit declaration
+var age int = 30
+var score float64
+`,
+        },
+        {
           lang: 'js',
           code: `// JS: prefer const for all non-reassigned values
 const count = 0;
@@ -82,6 +104,33 @@ const std::string VERSION = "1.0.0";
 
 // Prefer constexpr for compile-time constants
 constexpr double PI = 3.14159265358979;`,
+        },
+        {
+          lang: 'python',
+          code: `# No built-in const — use UPPER_SNAKE_CASE convention
+MAX_SIZE = 100
+PI = 3.14159
+
+# typing.Final signals no re-assignment to type checkers
+from typing import Final
+MAX_RETRIES: Final = 3
+`,
+        },
+        {
+          lang: 'go',
+          code: `const MaxSize = 100
+const Pi = 3.14159
+
+// Typed constant
+const Greeting string = "hello"
+
+// iota for enumerations
+const (
+    Small = iota  // 0
+    Medium        // 1
+    Large         // 2
+)
+`,
         },
         {
           lang: 'js',
@@ -135,6 +184,31 @@ double d    = 3.14;
 #include <cstdint>
 uint8_t  byte = 255;
 int32_t  i32  = 42;`,
+        },
+        {
+          lang: 'python',
+          code: `age: int = 30
+price: float = 9.99
+name: str = "Alice"
+active: bool = True
+none_val: None = None
+
+# Python ints are arbitrary-precision — no overflow
+big: int = 10 ** 100
+`,
+        },
+        {
+          lang: 'go',
+          code: `var age int = 30
+var price float64 = 9.99
+var name string = "Alice"
+var active bool = true
+var nothing interface{} = nil
+
+// Explicit int sizes when needed
+var b byte = 255  // uint8
+var r rune = 'A'  // int32 (Unicode code point)
+`,
         },
         {
           lang: 'js',
@@ -195,6 +269,33 @@ std::optional<std::string> opt = std::nullopt;
 std::string val = opt.value_or("default");`,
         },
         {
+          lang: 'python',
+          code: `# Python has only None — no undefined equivalent
+value: str | None = None
+
+# Idiomatic None check
+if value is None:
+    print("no value")
+
+# Falsy check (like JS !value)
+if not value:
+    print("falsy")
+`,
+        },
+        {
+          lang: 'go',
+          code: `// Go has nil for pointers, interfaces, maps, slices, channels
+var p *int = nil    // nil pointer
+var s []int = nil   // nil slice (valid, len=0)
+var m map[string]int = nil  // nil map
+
+// Zero values — Go initialises everything
+var x int    // 0
+var s2 string // ""
+var b bool   // false
+`,
+        },
+        {
           lang: 'js',
           code: `// JS has BOTH null (intentional absence) and
 // undefined (variable declared but not assigned)
@@ -253,6 +354,29 @@ auto items = std::vector{1, 2, 3}; // C++17 deduction
 
 // decltype: get the type of an expression
 decltype(count) other = 5;  // int`,
+        },
+        {
+          lang: 'python',
+          code: `# Python always infers — annotations are optional metadata
+count = 0           # int
+message = "hello"   # str
+items = [1, 2, 3]   # list[int]
+
+# mypy / pyright use hints for static analysis
+def greet(name: str) -> str:
+    return f"Hello, {name}"
+`,
+        },
+        {
+          lang: 'go',
+          code: `// := infers type from the right-hand side
+count := 0            // int
+message := "hello"    // string
+items := []int{1, 2, 3}  // []int
+
+// var with initialiser also infers
+var ratio = 3.14      // float64
+`,
         },
         {
           lang: 'js',

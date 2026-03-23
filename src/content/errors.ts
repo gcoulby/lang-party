@@ -49,6 +49,34 @@ try {
     // file closes automatically when scope exits`,
         },
         {
+          lang: 'python',
+          code: `try:
+    result = int("abc")
+except ValueError as e:
+    print(f"parse error: {e}")
+except (TypeError, RuntimeError) as e:
+    print(f"other error: {e}")
+else:
+    print("no error")  # runs if no exception
+finally:
+    print("always runs")
+`,
+        },
+        {
+          lang: 'go',
+          code: `// Go uses multiple return values — no exceptions
+result, err := strconv.Atoi("abc")
+if err != nil {
+    fmt.Printf("parse error: %v\\n", err)
+    return
+}
+fmt.Println(result)
+
+// defer runs on function exit (like finally)
+defer func() { fmt.Println("always runs") }()
+`,
+        },
+        {
           lang: 'js',
           code: `try {
     const result = JSON.parse(badJson);
@@ -133,6 +161,48 @@ private:
 
 // Throw and catch
 throw ValidationError("email", "invalid format");`,
+        },
+        {
+          lang: 'python',
+          code: `class ValidationError(Exception):
+    def __init__(self, field: str, message: str) -> None:
+        self.field = field
+        super().__init__(f"{field}: {message}")
+
+class NotFoundError(Exception):
+    pass
+
+def find_user(user_id: int) -> dict:
+    if user_id <= 0:
+        raise ValidationError("id", "must be positive")
+    raise NotFoundError(f"user {user_id} not found")
+`,
+        },
+        {
+          lang: 'go',
+          code: `import "errors"
+import "fmt"
+
+// Sentinel errors for type-checking with errors.Is
+var ErrNotFound = errors.New("not found")
+
+// Structured error with context
+type ValidationError struct {
+    Field   string
+    Message string
+}
+
+func (e *ValidationError) Error() string {
+    return fmt.Sprintf("%s: %s", e.Field, e.Message)
+}
+
+func findUser(id int) error {
+    if id <= 0 {
+        return &ValidationError{Field: "id", Message: "must be positive"}
+    }
+    return fmt.Errorf("user %d: %w", id, ErrNotFound)
+}
+`,
         },
         {
           lang: 'js',
@@ -220,6 +290,53 @@ if (result) {
 } else {
     std::cerr << result.error();
 }`,
+        },
+        {
+          lang: 'python',
+          code: `from dataclasses import dataclass
+from typing import Generic, TypeVar, Union
+
+T = TypeVar("T")
+E = TypeVar("E", bound=BaseException)
+
+@dataclass
+class Ok(Generic[T]):
+    value: T
+
+@dataclass
+class Err(Generic[E]):
+    error: E
+
+Result = Union[Ok[T], Err[E]]
+
+def divide(a: float, b: float) -> Result:
+    if b == 0:
+        return Err(ZeroDivisionError("cannot divide by zero"))
+    return Ok(a / b)
+
+match divide(10, 2):
+    case Ok(value=v): print(f"result: {v}")
+    case Err(error=e): print(f"error: {e}")
+`,
+        },
+        {
+          lang: 'go',
+          code: `// Go's idiomatic Result pattern: (T, error)
+func divide(a, b float64) (float64, error) {
+    if b == 0 {
+        return 0, errors.New("cannot divide by zero")
+    }
+    return a / b, nil
+}
+
+// Usage — must check error explicitly
+result, err := divide(10, 2)
+if err != nil {
+    fmt.Printf("error: %v\\n", err)
+    return
+}
+fmt.Printf("result: %v\\n", result)
+`,
         },
         {
           lang: 'js',

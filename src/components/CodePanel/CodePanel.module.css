@@ -27,10 +27,12 @@
   flex-shrink: 0;
 }
 
-.dot[data-lang='java'] { background: var(--java); }
-.dot[data-lang='cpp']  { background: var(--cpp); }
-.dot[data-lang='js']   { background: var(--js); }
-.dot[data-lang='ts']   { background: var(--ts); }
+.dot[data-lang='java']   { background: var(--java); }
+.dot[data-lang='cpp']    { background: var(--cpp); }
+.dot[data-lang='python'] { background: var(--python); }
+.dot[data-lang='go']     { background: var(--go); }
+.dot[data-lang='js']     { background: var(--js); }
+.dot[data-lang='ts']     { background: var(--ts); }
 
 .langName {
   font-family: var(--font-mono);
